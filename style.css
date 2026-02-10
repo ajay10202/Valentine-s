@@ -1,84 +1,140 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
-}
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;600&display=swap');
 
 body {
+    margin: 0;
+    padding: 0;
     height: 100vh;
-    background: linear-gradient(135deg, #ff5f6d, #ffc371);
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden; /* Prevents scrollbars when button moves */
+    position: relative;
 }
 
+/* Background Hearts */
+.heart-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.heart {
+    position: absolute;
+    bottom: -100px;
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    animation: floatUp linear infinite;
+    opacity: 0.6;
+}
+
+.heart::before, .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: inherit;
+}
+
+.heart::before { top: -10px; left: 0; }
+.heart::after { top: 0; left: -10px; }
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(45deg); opacity: 0.8; }
+    100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
+}
+
+/* Main Card */
 .container {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    padding: 40px 50px;
-    border-radius: 20px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    position: relative;
+    background: rgba(255, 255, 255, 0.90);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(255, 77, 109, 0.2);
+    z-index: 10;
+    max-width: 90%;
+    width: 400px;
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease;
 }
 
-h1 {
-    color: #fff;
-    font-size: 2.4rem;
-    margin-bottom: 30px;
+h1, h2 {
+    font-family: 'Pacifico', cursive;
+    color: #ff4d6d;
+    margin-bottom: 20px;
 }
 
-.buttons {
-    position: relative;
-    height: 80px;
+h1 { font-size: 2.2rem; }
+h2 { font-size: 2rem; }
+
+.gif-container img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }
 
 button {
-    padding: 14px 32px;
+    padding: 12px 30px;
     font-size: 1.1rem;
     border: none;
-    border-radius: 30px;
+    border-radius: 50px;
     cursor: pointer;
-    position: absolute;
-    transition: transform 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 #yesBtn {
-    background: #ff2e63;
-    color: #fff;
-    left: 30%;
+    background-color: #ff4d6d;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+    z-index: 100;
 }
 
 #yesBtn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    background-color: #d63353;
+    transform: scale(1.05);
 }
 
 #noBtn {
-    background: #fff;
-    color: #ff2e63;
-    left: 55%;
+    background-color: #e0e0e0;
+    color: #555;
+    position: relative; /* Allows switching to fixed */
+    z-index: 200; /* Higher Z-Index ensures it floats over everything */
+    transition: top 0.2s ease, left 0.2s ease; /* Smooth glide */
 }
 
-/* Floating hearts */
-.heart {
-    position: absolute;
-    color: rgba(255, 255, 255, 0.8);
-    animation: float 6s linear infinite;
+/* Utility Class */
+.hidden {
+    display: none;
 }
 
-@keyframes float {
-    0% {
-        transform: translateY(100vh) scale(0.8);
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-10vh) scale(1.3);
-        opacity: 0;
-    }
+/* Confetti Piece */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
 }
