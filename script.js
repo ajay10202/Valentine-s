@@ -4,86 +4,88 @@ const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const heartBg = document.getElementById('heartBg');
 
-// --- 1. DYNAMIC BACKGROUND HEARTS ---
-function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    
-    // Random position, color, and speed
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = Math.random() * 2 + 3 + "s"; // 3-5 seconds
-    
-    const colors = ['#ff9a9e', '#ffc3a0', '#ffafbd', '#ff4d6d'];
-    heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    heartBg.appendChild(heart);
+// --- 1. MOVE BUTTON LOGIC ---
+function moveNoButton(e) {
+    // Prevent the default click/touch behavior
+    if(e) e.preventDefault();
 
-    // Cleanup after animation
-    setTimeout(() => {
-        heart.remove();
-    }, 5000);
-}
-
-// Generate a new heart every 300ms
-setInterval(createHeart, 300);
-
-
-// --- 2. THE "NO" BUTTON EVASION ---
-function moveNoButton() {
-    // 1. Get viewport size (the screen)
+    // 1. Get dimensions
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-
-    // 2. Get button size
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
 
-    // 3. Calculate random position 
-    // We subtract the button size to ensure it doesn't go off-screen
-    const randomX = Math.random() * (windowWidth - btnWidth);
-    const randomY = Math.random() * (windowHeight - btnHeight);
+    // 2. Define a "Safe Zone" 
+    // We subtract padding to keep it away from the very edge
+    const padding = 20; 
+    const maxLeft = windowWidth - btnWidth - padding;
+    const maxTop = windowHeight - btnHeight - padding;
 
-    // 4. Apply the new position
-    noBtn.style.position = 'fixed'; // Allows it to move freely
-    noBtn.style.left = randomX + 'px';
-    noBtn.style.top = randomY + 'px';
+    // 3. Calculate new random position
+    // Math.max(padding, ...) ensures it doesn't go too far top/left
+    const randomLeft = Math.max(padding, Math.random() * maxLeft);
+    const randomTop = Math.max(padding, Math.random() * maxTop);
+
+    // 4. Apply new position
+    noBtn.style.position = 'fixed';
+    noBtn.style.left = randomLeft + 'px';
+    noBtn.style.top = randomTop + 'px';
 }
 
-// Trigger on Mouse Enter (Desktop)
-noBtn.addEventListener('mouseenter', moveNoButton);
-
-// Trigger on Touch (Mobile)
-// "touchstart" happens before a click, ensuring it moves before they can tap it
-noBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Stop the click
-    moveNoButton();
-});
+// EVENTS FOR "NO" BUTTON
+// Desktop Hover
+noBtn.addEventListener('mouseover', moveNoButton);
+// Mobile Touch (The most important one for phones)
+noBtn.addEventListener('touchstart', moveNoButton);
+// Click (Fallback)
+noBtn.addEventListener('click', moveNoButton);
 
 
-// --- 3. THE "YES" BUTTON CELEBRATION ---
+// --- 2. YES BUTTON LOGIC ---
 yesBtn.addEventListener('click', () => {
-    // Hide question, show success
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
-
-    // Trigger confetti
-    startConfetti();
+    createConfetti();
 });
 
-function startConfetti() {
+
+// --- 3. BACKGROUND EFFECTS ---
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = Math.random() * 2 + 3 + "s";
+    
+    // Random color
+    const colors = ['#ff4d6d', '#ff758f', '#ffb3c1', '#ffe5ec'];
+    heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    heartBg.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+}
+setInterval(createHeart, 300);
+
+// Simple Confetti
+function createConfetti() {
     for (let i = 0; i < 50; i++) {
         const confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        
-        // Random properties
+        confetti.style.position = 'fixed';
         confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.top = -10 + 'px';
-        confetti.style.backgroundColor = ['#ff0', '#f00', '#0f0', '#00f'][Math.floor(Math.random() * 4)];
-        confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
-        
+        confetti.style.top = '0';
+        confetti.style.width = '10px';
+        confetti.style.height = '10px';
+        confetti.style.backgroundColor = '#ff4d6d';
+        confetti.style.transition = 'all 3s linear';
+        confetti.style.zIndex = '1000';
         document.body.appendChild(confetti);
+        
+        // Trigger animation in next frame
+        setTimeout(() => {
+            confetti.style.top = '100vh';
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            confetti.style.opacity = '0';
+        }, 10);
 
-        // Cleanup
-        setTimeout(() => confetti.remove(), 4000);
+        setTimeout(() => confetti.remove(), 3000);
     }
 }
