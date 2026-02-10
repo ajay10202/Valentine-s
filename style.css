@@ -141,3 +141,15 @@ button {
 }
 
 .hidden { display: none; }
+}
+
+#noBtn {
+    background-color: #e0e0e0;
+    color: #555;
+    position: relative; 
+    z-index: 9999;
+    transition: top 0.2s ease, left 0.2s ease;
+}
+
+.hidden { display: none; }
+
