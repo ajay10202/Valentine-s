@@ -1,3 +1,26 @@
+/* Add this to your existing CSS file */
+
+.music-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.music-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+/* ... (Keep the rest of your CSS exactly the same as before) ... */
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;600&display=swap');
 
 body {
@@ -10,10 +33,9 @@ body {
     align-items: center;
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
     font-family: 'Poppins', sans-serif;
-    overflow: hidden; /* CRITICAL: Stops scrollbars from appearing when button moves */
+    overflow: hidden; 
 }
 
-/* Background Hearts */
 .heart-bg {
     position: absolute;
     width: 100%;
@@ -48,7 +70,6 @@ body {
     100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
 }
 
-/* Card Container */
 .container {
     text-align: center;
     background: rgba(255, 255, 255, 0.90);
@@ -57,7 +78,7 @@ body {
     box-shadow: 0 10px 40px rgba(0,0,0,0.1);
     z-index: 10;
     width: 90%;
-    max-width: 350px; /* Kept narrow for mobile aesthetic */
+    max-width: 350px; 
     backdrop-filter: blur(8px);
 }
 
@@ -80,7 +101,6 @@ p {
     border-radius: 15px;
 }
 
-/* Buttons */
 .btn-group {
     display: flex;
     justify-content: center;
@@ -110,7 +130,7 @@ button {
     background-color: #e0e0e0;
     color: #555;
     position: relative; 
-    z-index: 9999; /* CRITICAL: Always on top */
+    z-index: 9999;
     transition: top 0.2s ease, left 0.2s ease;
 }
 
