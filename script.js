@@ -4,42 +4,8 @@ const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const heartBg = document.getElementById('heartBg');
 const bgMusic = document.getElementById('bgMusic');
-const musicControl = document.getElementById('musicControl');
 
-// --- AUDIO LOGIC ---
-let isPlaying = false;
-
-function toggleMusic() {
-    if (isPlaying) {
-        bgMusic.pause();
-        musicControl.textContent = '🔇';
-    } else {
-        bgMusic.play().then(() => {
-            musicControl.textContent = '🎵';
-        }).catch(error => {
-            console.log("Auto-play blocked, waiting for interaction");
-        });
-    }
-    isPlaying = !isPlaying;
-}
-
-// Browser policy: Audio only plays after user interaction
-// We add a listener to the BODY to start music on the first click/touch anywhere
-document.body.addEventListener('click', () => {
-    if (!isPlaying) {
-        bgMusic.play();
-        isPlaying = true;
-        musicControl.textContent = '🎵';
-    }
-}, { once: true }); // "once: true" means this listener removes itself after running once
-
-musicControl.addEventListener('click', (e) => {
-    e.stopPropagation(); // Stop the body click listener from interfering
-    toggleMusic();
-});
-
-
-// --- NO BUTTON LOGIC ---
+// --- 1. "NO" BUTTON LOGIC (Unchanged) ---
 function moveNoButton(e) {
     if(e) e.preventDefault();
 
@@ -47,9 +13,8 @@ function moveNoButton(e) {
     const windowHeight = window.innerHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
-
-    // Safe Zone Padding
     const padding = 30; 
+    
     const maxLeft = windowWidth - btnWidth - padding;
     const maxTop = windowHeight - btnHeight - padding;
 
@@ -66,15 +31,25 @@ noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 
 
-// --- YES BUTTON LOGIC ---
+// --- 2. "YES" BUTTON & MUSIC LOGIC ---
 yesBtn.addEventListener('click', () => {
+    // 1. Swap the content
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
+
+    // 2. Play the music
+    // Since this is triggered by a user click, browsers allow it immediately.
+    bgMusic.volume = 0.5; // Set volume to 50%
+    bgMusic.play().catch(error => {
+        console.log("Music play failed (browser might require more interaction):", error);
+    });
+
+    // 3. Start the celebration effects
     createConfetti();
 });
 
 
-// --- BACKGROUND & CONFETTI ---
+// --- 3. BACKGROUND ANIMATIONS (Unchanged) ---
 function createHeart() {
     const heart = document.createElement('div');
     heart.classList.add('heart');
@@ -98,16 +73,17 @@ function createConfetti() {
         confetti.style.width = '10px';
         confetti.style.height = '10px';
         confetti.style.backgroundColor = '#ff4d6d';
-        confetti.style.transition = 'all 3s linear';
         confetti.style.zIndex = '1000';
         document.body.appendChild(confetti);
         
-        setTimeout(() => {
-            confetti.style.top = '100vh';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-            confetti.style.opacity = '0';
-        }, 10);
+        const animation = confetti.animate([
+            { transform: `translate(0,0)`, opacity: 1 },
+            { transform: `translate(${Math.random()*100 - 50}px, 100vh) rotate(720deg)`, opacity: 0 }
+        ], {
+            duration: Math.random() * 2000 + 1500,
+            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        });
 
-        setTimeout(() => confetti.remove(), 3000);
+        animation.onfinish = () => confetti.remove();
     }
 }
