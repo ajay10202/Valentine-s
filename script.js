@@ -5,7 +5,7 @@ const successSection = document.getElementById('successSection');
 const heartBg = document.getElementById('heartBg');
 const bgMusic = document.getElementById('bgMusic');
 
-// --- 1. "NO" BUTTON LOGIC (Unchanged) ---
+// --- 1. "NO" BUTTON LOGIC (RESTRICTED TO MIDDLE) ---
 function moveNoButton(e) {
     if(e) e.preventDefault();
 
@@ -13,17 +13,23 @@ function moveNoButton(e) {
     const windowHeight = window.innerHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
-    const padding = 30; 
-    
-    const maxLeft = windowWidth - btnWidth - padding;
-    const maxTop = windowHeight - btnHeight - padding;
 
-    const randomLeft = Math.max(padding, Math.random() * maxLeft);
-    const randomTop = Math.max(padding, Math.random() * maxTop);
+    // Define the "Middle Box" size
+    // The button will move within a 300px square in the center of the screen
+    const range = 300; 
 
+    // Calculate the starting X and Y to center the movement area
+    const startX = (windowWidth - range) / 2;
+    const startY = (windowHeight - range) / 2;
+
+    // Generate random position WITHIN that central range
+    const randomX = startX + Math.random() * (range - btnWidth);
+    const randomY = startY + Math.random() * (range - btnHeight);
+
+    // Apply new position
     noBtn.style.position = 'fixed';
-    noBtn.style.left = randomLeft + 'px';
-    noBtn.style.top = randomTop + 'px';
+    noBtn.style.left = randomX + 'px';
+    noBtn.style.top = randomY + 'px';
 }
 
 noBtn.addEventListener('mouseover', moveNoButton);
@@ -38,10 +44,9 @@ yesBtn.addEventListener('click', () => {
     successSection.classList.remove('hidden');
 
     // 2. Play the music
-    // Since this is triggered by a user click, browsers allow it immediately.
-    bgMusic.volume = 0.5; // Set volume to 50%
+    bgMusic.volume = 0.5; 
     bgMusic.play().catch(error => {
-        console.log("Music play failed (browser might require more interaction):", error);
+        console.log("Music play failed:", error);
     });
 
     // 3. Start the celebration effects
