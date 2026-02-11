@@ -28,10 +28,13 @@ const taunts = [
 
 // --- 2. MOVE BUTTON LOGIC (Works on Touch & Mouse) ---
 function moveNoButton(e) {
-    // Stop default behavior (prevents clicking on mobile)
-    if(e && e.type === 'touchstart') e.preventDefault();
+    // 1. Prevent Default Click Behavior
+    if(e) {
+        e.preventDefault(); 
+        e.stopPropagation();
+    }
 
-    // Play Funny Music (Only starts once)
+    // 2. Play Funny Music (Only starts once)
     if (!isNoMusicPlaying) {
         noSound.volume = 0.5;
         noSound.currentTime = 0;
@@ -39,32 +42,44 @@ function moveNoButton(e) {
         isNoMusicPlaying = true;
     }
 
-    // Shrink "No" / Grow "Yes"
-    if (noScale > 0.6) {
+    // 3. Shrink "No" / Grow "Yes"
+    // Limited shrinking to 0.75 so it doesn't disappear completely
+    if (noScale > 0.75) {
         noScale -= 0.05;
         noBtn.style.transform = `scale(${noScale})`;
     }
     yesScale += 0.15;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // Calculate Safe Screen Boundaries
-    // We deduct 50px buffer to ensure it doesn't go under browser bars
-    const w = window.innerWidth - noBtn.offsetWidth - 20;
-    const h = window.innerHeight - noBtn.offsetHeight - 20;
+    // 4. Calculate Safe Screen Boundaries (The Fix)
+    // We calculate the maximum X and Y coordinates the button can exist at
+    // without overflowing the screen.
+    const buttonWidth = noBtn.offsetWidth;
+    const buttonHeight = noBtn.offsetHeight;
     
-    // Ensure button stays within viewport
-    const randomLeft = Math.max(10, Math.min(w, Math.random() * w));
-    const randomTop = Math.max(10, Math.min(h, Math.random() * h));
+    // Window dimensions minus button size minus a 20px padding
+    const maxLeft = window.innerWidth - buttonWidth - 20;
+    const maxTop = window.innerHeight - buttonHeight - 20;
 
-    noBtn.style.position = 'fixed';
+    // Ensure we don't get negative numbers
+    const safeLeft = Math.max(10, maxLeft);
+    const safeTop = Math.max(10, maxTop);
+
+    // Generate random coordinates within the safe zone
+    const randomLeft = Math.floor(Math.random() * safeLeft);
+    const randomTop = Math.floor(Math.random() * safeTop);
+
+    // Apply the new position
+    noBtn.style.position = 'fixed'; // Sticks it to the screen
     noBtn.style.left = randomLeft + 'px';
     noBtn.style.top = randomTop + 'px';
+    noBtn.style.zIndex = '9999'; // Ensures it stays on top
     
-    // Change Text & Image
+    // 5. Change Text & Image
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
     mainGif.src = cuteGifs[Math.floor(Math.random() * cuteGifs.length)];
 
-    // Drain Love Meter
+    // 6. Drain Love Meter
     loveScore = Math.max(0, loveScore - 5);
     loveMeterBar.style.width = loveScore + "%";
 }
@@ -74,6 +89,8 @@ function moveNoButton(e) {
 noBtn.addEventListener('mouseover', moveNoButton);
 // Touchstart for Mobile (fires immediately on tap)
 noBtn.addEventListener('touchstart', moveNoButton);
+// Click (Fallback for super fast clickers)
+noBtn.addEventListener('click', moveNoButton);
 
 
 // --- 3. YES BUTTON LOGIC ---
@@ -92,7 +109,7 @@ yesBtn.addEventListener('click', () => {
     loveScore = 100;
     loveMeterBar.style.width = "100%";
 
-    // Rain Kisses - Optimized with ClearInterval
+    // Rain Kisses - Optimized
     const kissInterval = setInterval(() => {
         const kiss = document.createElement('div');
         kiss.classList.add('kiss');
