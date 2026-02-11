@@ -2,163 +2,118 @@ const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
-const mainContainer = document.getElementById('mainContainer');
-const loveMeterBar = document.getElementById('loveMeterBar');
-const mainGif = document.getElementById('mainGif');
 const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
-const typewriterElement = document.getElementById('typewriterText');
+const bgHearts = document.getElementById('floatingHearts');
 
-let isNoMusicPlaying = false;
-let yesScale = 1; 
-let noScale = 1;
-let loveScore = 30;
+// --- 1. AUDIO UNLOCK ---
+let audioUnlocked = false;
+function unlockAudio() {
+    if (!audioUnlocked) {
+        noSound.play().then(() => {
+            noSound.pause();
+            noSound.currentTime = 0;
+            audioUnlocked = true;
+        }).catch(() => {});
+    }
+}
+window.onload = unlockAudio;
+document.body.addEventListener('touchstart', unlockAudio, {once:true});
+document.body.addEventListener('click', unlockAudio, {once:true});
+document.body.addEventListener('mousemove', unlockAudio, {once:true});
 
-// --- 1. DYNAMIC CONTENT ---
-const cuteGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzhjOTZlNjUzZmYxZDRiNzM5MGNmODk4MzRjZWMzYWM2M2U5YzYwZCZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/JTj1b7i2V218n1gU9N/giphy.gif",
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExazZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/OPU6wzx8JrHna/giphy.gif",
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/26BRL7YrutHKs/giphy.gif"
-];
 
-const taunts = [
-    "Too slow! 🐢", "Try again! 😜", "Not happening! 🛑", 
-    "Just click Yes! ❤️", "I'm fast! ⚡", "Love me! 🥺", "Missed me! 👻"
-];
+// --- 2. CENTERED MOVEMENT LOGIC ---
+let yesScale = 1;
 
-// --- 2. MOVE BUTTON LOGIC (Center Box Edition) ---
 function moveNoButton(e) {
-    // 1. Prevent Default Click Behavior
-    if(e) {
-        e.preventDefault(); 
-        e.stopPropagation();
+    if(e) e.preventDefault();
+
+    if (audioUnlocked && noSound.paused) {
+        noSound.volume = 0.5; 
+        noSound.play();
     }
 
-    // 2. Play Funny Music (Only starts once)
-    if (!isNoMusicPlaying) {
-        noSound.volume = 0.5;
-        noSound.currentTime = 0;
-        noSound.play().catch(e => console.log("Audio requires interaction"));
-        isNoMusicPlaying = true;
-    }
-
-    // 3. Shrink "No" / Grow "Yes"
-    if (noScale > 0.75) {
-        noScale -= 0.05;
-        noBtn.style.transform = `scale(${noScale})`;
-    }
-    yesScale += 0.2;
+    // Grow Yes
+    yesScale += 0.1;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // 4. CALCULATE "CENTER ZONE" POSITION
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-    const btnWidth = noBtn.offsetWidth;
-    const btnHeight = noBtn.offsetHeight;
+    // --- NEW CENTERED MATH ---
+    // Instead of the whole screen, we define a "Movement Box" in the center
+    const moveRange = 150; // Pixels to move from center
+    
+    // Get center of screen
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    
+    // Get button size
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
 
-    // Define the "Boxing Ring" (The middle 60% of the screen)
-    // This keeps the button away from the very edges
-    const minX = (winWidth * 0.20); // Starts at 20% from left
-    const maxX = (winWidth * 0.80) - btnWidth; // Ends at 80% from left
+    // Calculate new position relative to center
+    // (Math.random() - 0.5) gives a number between -0.5 and 0.5
+    // Multiply by moveRange * 2 to span full left/right range
+    const randomX = (centerX - (btnW / 2)) + ((Math.random() - 0.5) * moveRange * 2);
+    const randomY = (centerY - (btnH / 2)) + ((Math.random() - 0.5) * moveRange * 2);
 
-    const minY = (winHeight * 0.20); // Starts at 20% from top
-    const maxY = (winHeight * 0.80) - btnHeight; // Ends at 80% from top
-
-    // Generate random coordinates strictly within this center box
-    const randomX = Math.random() * (maxX - minX) + minX;
-    const randomY = Math.random() * (maxY - minY) + minY;
-
-    // Apply the new position
-    noBtn.style.position = 'fixed'; 
+    // Apply position
+    noBtn.style.position = 'fixed';
     noBtn.style.left = randomX + 'px';
     noBtn.style.top = randomY + 'px';
-    noBtn.style.zIndex = '10000'; // Stays on top of everything
     
-    // 5. Change Text & Image
-    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
-    mainGif.src = cuteGifs[Math.floor(Math.random() * cuteGifs.length)];
-
-    // 6. Drain Love Meter
-    loveScore = Math.max(0, loveScore - 5);
-    loveMeterBar.style.width = loveScore + "%";
+    // Rotate slightly for effect
+    const rotate = Math.random() * 20 - 10;
+    noBtn.style.transform = `rotate(${rotate}deg)`;
 }
 
-// EVENTS:
-// Mouseover for PC
 noBtn.addEventListener('mouseover', moveNoButton);
-// Touchstart for Mobile (fires immediately on tap)
 noBtn.addEventListener('touchstart', moveNoButton);
-// Click (Unlimited attempts backup)
 noBtn.addEventListener('click', moveNoButton);
 
 
-// --- 3. YES BUTTON LOGIC ---
+// --- 3. YES LOGIC ---
 yesBtn.addEventListener('click', () => {
-    // Switch Audio
     noSound.pause();
     noSound.currentTime = 0;
-    yesSound.volume = 0.6;
-    yesSound.play().catch(e => console.log("Audio requires interaction"));
+    yesSound.volume = 0.8;
+    yesSound.play();
 
-    // Show Success
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
 
-    // Fill Love Meter
-    loveScore = 100;
-    loveMeterBar.style.width = "100%";
-
-    // Rain Kisses - Optimized
-    const kissInterval = setInterval(() => {
-        const kiss = document.createElement('div');
-        kiss.classList.add('kiss');
-        kiss.innerText = '💋';
-        kiss.style.left = Math.random() * 100 + "vw";
-        kiss.style.top = '-50px';
-        document.body.appendChild(kiss);
-        
-        // Remove element after animation
-        setTimeout(() => kiss.remove(), 3000);
-    }, 200);
-
-    // Stop creating kisses after 10 seconds to save performance
-    setTimeout(() => {
-        clearInterval(kissInterval);
-    }, 10000);
+    createConfetti();
 });
 
 
-// --- 4. EXTRAS (PC ONLY FEATURES) ---
-if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    // 3D Tilt
-    document.addEventListener('mousemove', (e) => {
-        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-        mainContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-    });
-
-    // Sparkle Trail
-    document.addEventListener('mousemove', (e) => {
-        const sparkle = document.createElement('div');
-        sparkle.classList.add('sparkle');
-        sparkle.style.left = e.pageX + 'px';
-        sparkle.style.top = e.pageY + 'px';
-        document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 800);
-    });
+// --- 4. ANIMATIONS ---
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('bg-heart');
+    heart.innerHTML = "❤";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = Math.random() * 3 + 3 + "s";
+    bgHearts.appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
 }
+setInterval(createHeart, 500);
 
-// Typing Effect
-const text = "Will you be my Valentine?";
-let index = 0;
-
-function typeWriter() {
-    if (index < text.length) {
-        typewriterElement.innerHTML += text.charAt(index);
-        index++;
-        setTimeout(typeWriter, 100);
+function createConfetti() {
+    for(let i=0; i<50; i++) {
+        const confetti = document.createElement('div');
+        confetti.innerText = '💋';
+        confetti.style.position = 'fixed';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '-50px';
+        confetti.style.fontSize = '2rem';
+        // Add style tag for animation if needed or rely on JS loop
+        confetti.animate([
+            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+            { transform: 'translateY(110vh) rotate(360deg)', opacity: 0 }
+        ], {
+            duration: Math.random() * 2000 + 2000,
+            easing: 'linear'
+        });
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 4000);
     }
 }
-
-// Start typing when page loads
-window.onload = typeWriter;
