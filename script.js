@@ -2,138 +2,143 @@ const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
+const loveMeterBar = document.getElementById('loveMeterBar');
+const mainGif = document.getElementById('mainGif');
 const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
-const bgHearts = document.getElementById('floatingHearts');
+const startOverlay = document.getElementById('startOverlay');
+const petalsContainer = document.getElementById('petalsContainer');
 
-// --- 1. AUDIO AUTO-START LOGIC ---
-// Browsers block audio until interaction. This unlocks it on the FIRST touch/click anywhere.
-let audioUnlocked = false;
+let isAudioUnlocked = false;
+let yesScale = 1; 
+let noScale = 1;
+let loveScore = 30;
 
-function unlockAudio() {
-    if (!audioUnlocked) {
-        // Try to play 'No' music silently to unlock the audio engine
-        noSound.play().then(() => {
-            noSound.pause();
-            noSound.currentTime = 0;
-            audioUnlocked = true;
-        }).catch((e) => {
-            console.log("Waiting for interaction...");
-        });
-    }
-}
+// --- 0. START & AUDIO UNLOCK ---
+startOverlay.addEventListener('click', () => {
+    // Attempt to play and immediately pause to "unlock" audio context
+    noSound.play().then(() => noSound.pause());
+    yesSound.play().then(() => yesSound.pause());
+    
+    // Hide overlay
+    startOverlay.style.opacity = '0';
+    setTimeout(() => {
+        startOverlay.style.display = 'none';
+        isAudioUnlocked = true;
+    }, 500);
 
-// Try immediately on load
-window.onload = unlockAudio;
-// Try on any touch or click anywhere on the page
-document.body.addEventListener('touchstart', unlockAudio, {once:true});
-document.body.addEventListener('click', unlockAudio, {once:true});
-document.body.addEventListener('mousemove', unlockAudio, {once:true});
+    // Start background petals
+    setInterval(createPetal, 300);
+});
 
-
-// --- 2. MOVE BUTTON LOGIC (FIXED FOR MOBILE & PC) ---
-let yesScale = 1;
-
+// --- 1. MOVE BUTTON LOGIC (FIXED BOUNDARIES) ---
 function moveNoButton(e) {
-    // Prevent default touch actions (scrolling/zooming) on the button
-    if(e) e.preventDefault();
+    if(e) e.preventDefault(); // Stop click/touch behavior
 
-    // PLAY AUDIO (If unlocked, play the chase music)
-    if (audioUnlocked && noSound.paused) {
-        noSound.volume = 0.5; // Set volume
+    // Play "No" music if unlocked
+    if (isAudioUnlocked && noSound.paused) {
+        noSound.volume = 0.5;
         noSound.play();
     }
 
-    // MAKE "YES" BIGGER
+    // Shrink "No" / Grow "Yes"
+    if (noScale > 0.6) {
+        noScale -= 0.05;
+        noBtn.style.transform = `scale(${noScale})`;
+    }
     yesScale += 0.1;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // CALCULATE SAFE ZONE (Visible Screen Only)
-    // We get the exact width/height of the window
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-    const btnWidth = noBtn.offsetWidth;
-    const btnHeight = noBtn.offsetHeight;
+    // --- CRITICAL BOUNDARY FIX ---
+    // Get visible screen size
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+    
+    // Button dimensions
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
 
-    // We subtract padding (30px) so it never touches the edge
-    const maxLeft = winWidth - btnWidth - 30;
-    const maxTop = winHeight - btnHeight - 30;
-
-    // Generate random coordinates within safe zone
-    const randomLeft = Math.max(10, Math.random() * maxLeft);
-    const randomTop = Math.max(10, Math.random() * maxTop);
+    // Calculate Safe Area (Padding of 20px)
+    const maxX = screenW - btnW - 20;
+    const maxY = screenH - btnH - 20;
+    
+    // Generate random position
+    const randomX = Math.max(10, Math.random() * maxX);
+    const randomY = Math.max(10, Math.random() * maxY);
 
     // Apply strict Fixed positioning
     noBtn.style.position = 'fixed';
-    noBtn.style.left = randomLeft + 'px';
-    noBtn.style.top = randomTop + 'px';
-    
-    // Add random rotation for fun
-    const rotate = Math.random() * 30 - 15;
-    noBtn.style.transform = `rotate(${rotate}deg)`;
+    noBtn.style.left = randomX + 'px';
+    noBtn.style.top = randomY + 'px';
+
+    // Change Taunts
+    const taunts = ["Too slow! 😜", "Try again! 🐢", "Love me! 🥺", "Missed! 💨", "Sullu po! 😂"];
+    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
+
+    // Drain Love Meter
+    loveScore = Math.max(0, loveScore - 5);
+    loveMeterBar.style.width = loveScore + "%";
 }
 
-// TRIGGER EVENTS
-// Mouse: triggers when cursor touches it
+// EVENTS (Both Mouse & Touch)
 noBtn.addEventListener('mouseover', moveNoButton);
-// Touch: triggers immediately when finger touches it
 noBtn.addEventListener('touchstart', moveNoButton);
-// Click: Fallback
+// Fallback click (in case they manage to tap it)
 noBtn.addEventListener('click', moveNoButton);
 
 
-// --- 3. YES BUTTON LOGIC ---
+// --- 2. YES BUTTON LOGIC ---
 yesBtn.addEventListener('click', () => {
-    // Stop Chase Music
-    noSound.pause();
-    noSound.currentTime = 0;
-    
-    // Play Love Music
-    yesSound.volume = 0.8;
-    yesSound.play();
+    if(isAudioUnlocked) {
+        noSound.pause();
+        noSound.currentTime = 0;
+        yesSound.volume = 0.8;
+        yesSound.play();
+    }
 
-    // Show Success Screen
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
 
-    // Create Celebration Effects
-    startConfetti();
+    loveScore = 100;
+    loveMeterBar.style.width = "100%";
+
+    // Rain Kisses
+    setInterval(() => {
+        const kiss = document.createElement('div');
+        kiss.innerHTML = '💋';
+        kiss.style.position = 'fixed';
+        kiss.style.fontSize = '2rem';
+        kiss.style.left = Math.random() * 100 + "vw";
+        kiss.style.top = '-50px';
+        kiss.style.animation = 'fall 3s linear forwards';
+        document.body.appendChild(kiss);
+        setTimeout(() => kiss.remove(), 3000);
+    }, 200);
 });
 
 
-// --- 4. BACKGROUND EFFECTS ---
-function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('bg-heart');
-    heart.innerHTML = "❤";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = Math.random() * 3 + 3 + "s";
-    bgHearts.appendChild(heart);
-    setTimeout(() => heart.remove(), 6000);
+// --- 3. BACKGROUND PETALS ---
+function createPetal() {
+    const petal = document.createElement('div');
+    petal.classList.add('petal');
+    petal.style.left = Math.random() * 100 + "vw";
+    petal.style.animationDuration = Math.random() * 3 + 2 + "s";
+    petal.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e'][Math.floor(Math.random()*3)];
+    petalsContainer.appendChild(petal);
+    setTimeout(() => petal.remove(), 5000);
 }
-setInterval(createHeart, 500);
 
-function startConfetti() {
-    for(let i=0; i<50; i++) {
-        const confetti = document.createElement('div');
-        confetti.innerText = '💋';
-        confetti.style.position = 'fixed';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.top = '-50px';
-        confetti.style.fontSize = '2rem';
-        confetti.style.animation = `fall ${Math.random()*3+2}s linear forwards`;
-        document.body.appendChild(confetti);
-        
-        // Keyframes for falling are defined in CSS via JS insert or just use inline style for simplicity
-        // We will just let them fall with simple CSS added dynamically
-        confetti.animate([
-            { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-            { transform: 'translateY(110vh) rotate(360deg)', opacity: 0 }
-        ], {
-            duration: Math.random() * 2000 + 2000,
-            easing: 'linear'
-        });
-        
-        setTimeout(() => confetti.remove(), 4000);
+
+// --- 4. TYPING EFFECT ---
+const text = "Will you be my Valentine?";
+let index = 0;
+const typewriterElement = document.getElementById('typewriterText');
+function typeWriter() {
+    if (index < text.length) {
+        typewriterElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(typeWriter, 100);
     }
 }
+// Start typing after overlay is clicked or window load
+window.onload = typeWriter;
