@@ -3,32 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Be My Valentine?</title>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <title>Be My Valentine? 🌹</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <audio id="bgMusic" loop preload="auto">
-        <source src="music.mp3" type="audio/mp3">
+    <audio id="noSound" loop preload="auto">
+        <source src="no.mp3" type="audio/mp3">
     </audio>
 
+    <audio id="yesSound" loop preload="auto">
+        <source src="yes.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="meter-container">
+        <div class="meter-label">Love Meter ❤️</div>
+        <div class="meter-bar-bg">
+            <div id="loveMeterBar" class="meter-bar-fill"></div>
+        </div>
+    </div>
+
     <div id="flashOverlay"></div>
-    
-    <div id="emojiRainContainer"></div>
-
     <div class="heart-bg" id="heartBg"></div>
-
+    
     <div class="container" id="mainContainer">
         
         <div id="questionSection">
             <div class="gif-container">
                 <img id="mainGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzhjOTZlNjUzZmYxZDRiNzM5MGNmODk4MzRjZWMzYWM2M2U5YzYwZCZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/JTj1b7i2V218n1gU9N/giphy.gif" alt="Cute bear">
             </div>
+            
             <h1 id="typewriterText"></h1>
-            <p>Try To Click No (I Dare You!) 😈</p>
+            <p>Don't break my heart... 🥺</p>
+            
             <div class="btn-group">
-                <button id="yesBtn">Yes! 🩵</button>
+                <button id="yesBtn">Yes! 💖</button>
                 <button id="noBtn">No 💔</button>
             </div>
         </div>
@@ -38,8 +49,8 @@
                 <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
             </div>
             <h2>I Love You Di Pondati 🩵💛</h2>
-            <p>Happy Valentine's Day 💋</p>
-            <p class="music-note">You're the best thing that ever happened to me, and I love you more every single day.🩵💛</p>
+            <p class="romantic-msg">You are my today and all of my tomorrows. 💋</p>
+            <p class="music-note">🎵 Our song is playing... 🎵</p>
         </div>
 
     </div>
