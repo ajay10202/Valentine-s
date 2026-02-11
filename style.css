@@ -11,52 +11,19 @@ body {
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
     font-family: 'Poppins', sans-serif;
     overflow: hidden; 
-    /* Custom Heart Cursor */
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff4d6d"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
 }
 
-/* Floating Pleading Text Animation */
-.floating-text {
+/* Flash Overlay for Angry Effect */
+#flashOverlay {
     position: fixed;
-    color: #ff4d6d;
-    font-family: 'Sacramento', cursive;
-    font-weight: bold;
-    font-size: 1.5rem;
-    pointer-events: none; /* Mouse goes through it */
-    z-index: 9998;
-    animation: floatUpFade 1.5s ease-out forwards;
-}
-
-@keyframes floatUpFade {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
-}
-
-/* Cursor Trail Hearts */
-.trail-heart {
-    position: fixed;
-    height: 15px;
-    width: 15px;
-    background-color: #ff4d6d;
-    border-radius: 50%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(255, 0, 0, 0.1);
     pointer-events: none;
-    z-index: 99999;
-    animation: fadeOut 1s linear forwards;
-}
-.trail-heart::before, .trail-heart::after {
-    content: "";
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: inherit;
-}
-.trail-heart::before { top: -7.5px; left: 0; }
-.trail-heart::after { top: 0; left: -7.5px; }
-
-@keyframes fadeOut {
-    0% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.5) translateY(-20px); }
+    opacity: 0;
+    z-index: 5;
+    transition: opacity 0.2s ease;
 }
 
 /* Background Hearts */
@@ -94,6 +61,7 @@ body {
     100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
 }
 
+/* Main Container */
 .container {
     text-align: center;
     background: rgba(255, 255, 255, 0.90);
@@ -105,6 +73,18 @@ body {
     max-width: 350px; 
     backdrop-filter: blur(8px);
     transition: all 0.5s ease;
+}
+
+/* Shake Animation Class */
+.shake-effect {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
 }
 
 h1 {
@@ -121,12 +101,6 @@ h2 {
     color: #ff4d6d;
     font-size: 2.5rem;
     margin: 10px 0;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popIn {
-    0% { opacity: 0; transform: scale(0.5); }
-    100% { opacity: 1; transform: scale(1); }
 }
 
 p {
@@ -146,20 +120,13 @@ p {
     animation: pulse 1.5s infinite;
 }
 
-@keyframes pulse {
-    0% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0.5; transform: scale(1); }
-}
-
 .gif-container img {
     width: 100%;
     max-width: 180px;
     border-radius: 15px;
-    transition: transform 0.3s ease; /* Smooth transition when image changes */
+    transition: transform 0.3s ease;
 }
 
-/* Button Group with Fixed Height */
 .btn-group {
     display: flex;
     justify-content: center;
@@ -193,7 +160,52 @@ button {
     color: #555;
     position: relative; 
     z-index: 9999;
-    transition: top 0.2s ease, left 0.2s ease;
+    /* Transition for smooth movement AND spin */
+    transition: top 0.2s ease, left 0.2s ease, transform 0.4s ease, background-color 0.3s;
+}
+
+/* Floating Text */
+.floating-text {
+    position: fixed;
+    color: #ff4d6d;
+    font-family: 'Sacramento', cursive;
+    font-weight: bold;
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 9998;
+    animation: floatUpFade 1.5s ease-out forwards;
+}
+
+@keyframes floatUpFade {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-50px) scale(1.2); }
+}
+
+/* Trail Heart */
+.trail-heart {
+    position: fixed;
+    height: 15px;
+    width: 15px;
+    background-color: #ff4d6d;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    animation: fadeOut 1s linear forwards;
+}
+.trail-heart::before, .trail-heart::after {
+    content: "";
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: inherit;
+}
+.trail-heart::before { top: -7.5px; left: 0; }
+.trail-heart::after { top: 0; left: -7.5px; }
+
+@keyframes fadeOut {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.5) translateY(-20px); }
 }
 
 .hidden { display: none; }
