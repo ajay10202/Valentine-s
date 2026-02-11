@@ -26,9 +26,9 @@ const taunts = [
     "Just click Yes! ❤️", "I'm fast! ⚡", "Love me! 🥺", "Missed me! 👻"
 ];
 
-// --- 2. MOVE BUTTON LOGIC (The "Teleport" Engine) ---
+// --- 2. MOVE BUTTON LOGIC (Center Box Edition) ---
 function moveNoButton(e) {
-    // 1. STOP the click from actually working
+    // 1. Prevent Default Click Behavior
     if(e) {
         e.preventDefault(); 
         e.stopPropagation();
@@ -42,59 +42,53 @@ function moveNoButton(e) {
         isNoMusicPlaying = true;
     }
 
-    // 3. Make "Yes" Button HUGE and "No" Button Tiny
-    // We cap the "No" shrinkage at 0.8 so it doesn't become invisible
-    if (noScale > 0.8) {
+    // 3. Shrink "No" / Grow "Yes"
+    if (noScale > 0.75) {
         noScale -= 0.05;
         noBtn.style.transform = `scale(${noScale})`;
     }
-    yesScale += 0.2; // Grow Yes button faster
+    yesScale += 0.2;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // 4. CALCULATE SAFE POSITION (The Fix for Disappearing)
-    
-    // Get the actual width/height of the browser window
+    // 4. CALCULATE "CENTER ZONE" POSITION
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
-    
-    // Get the button size
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
 
-    // Calculate the maximum X and Y allowed (Window size - Button size - 20px padding)
-    // We use Math.max(0, ...) to ensure we don't get negative numbers on small phones
-    const maxX = Math.max(0, winWidth - btnWidth - 20);
-    const maxY = Math.max(0, winHeight - btnHeight - 20);
+    // Define the "Boxing Ring" (The middle 60% of the screen)
+    // This keeps the button away from the very edges
+    const minX = (winWidth * 0.20); // Starts at 20% from left
+    const maxX = (winWidth * 0.80) - btnWidth; // Ends at 80% from left
 
-    // Generate random coordinates within these safe limits
-    const randomX = Math.floor(Math.random() * maxX);
-    const randomY = Math.floor(Math.random() * maxY);
+    const minY = (winHeight * 0.20); // Starts at 20% from top
+    const maxY = (winHeight * 0.80) - btnHeight; // Ends at 80% from top
+
+    // Generate random coordinates strictly within this center box
+    const randomX = Math.random() * (maxX - minX) + minX;
+    const randomY = Math.random() * (maxY - minY) + minY;
 
     // Apply the new position
-    noBtn.style.position = 'fixed'; // detach from layout
+    noBtn.style.position = 'fixed'; 
     noBtn.style.left = randomX + 'px';
     noBtn.style.top = randomY + 'px';
-    noBtn.style.zIndex = '10000'; // Always on top
+    noBtn.style.zIndex = '10000'; // Stays on top of everything
     
     // 5. Change Text & Image
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
     mainGif.src = cuteGifs[Math.floor(Math.random() * cuteGifs.length)];
 
-    // 6. Drain Love Meter slightly
+    // 6. Drain Love Meter
     loveScore = Math.max(0, loveScore - 5);
     loveMeterBar.style.width = loveScore + "%";
 }
 
-// --- EVENTS ---
-// 1. Mouseover: For PC users hovering
+// EVENTS:
+// Mouseover for PC
 noBtn.addEventListener('mouseover', moveNoButton);
-
-// 2. Touchstart: For Mobile users tapping
+// Touchstart for Mobile (fires immediately on tap)
 noBtn.addEventListener('touchstart', moveNoButton);
-
-// 3. Click: THE BACKUP PLAN
-// If they are super fast and actually click it, or if hover fails, 
-// this ensures it STILL moves instead of submitting "No".
+// Click (Unlimited attempts backup)
 noBtn.addEventListener('click', moveNoButton);
 
 
@@ -114,7 +108,7 @@ yesBtn.addEventListener('click', () => {
     loveScore = 100;
     loveMeterBar.style.width = "100%";
 
-    // Rain Kisses Animation
+    // Rain Kisses - Optimized
     const kissInterval = setInterval(() => {
         const kiss = document.createElement('div');
         kiss.classList.add('kiss');
@@ -123,17 +117,18 @@ yesBtn.addEventListener('click', () => {
         kiss.style.top = '-50px';
         document.body.appendChild(kiss);
         
+        // Remove element after animation
         setTimeout(() => kiss.remove(), 3000);
-    }, 300);
+    }, 200);
 
-    // Stop animation after 10 seconds to save battery
+    // Stop creating kisses after 10 seconds to save performance
     setTimeout(() => {
         clearInterval(kissInterval);
     }, 10000);
 });
 
 
-// --- 4. EXTRAS (PC ONLY) ---
+// --- 4. EXTRAS (PC ONLY FEATURES) ---
 if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
     // 3D Tilt
     document.addEventListener('mousemove', (e) => {
@@ -142,7 +137,7 @@ if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         mainContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
     });
 
-    // Sparkles
+    // Sparkle Trail
     document.addEventListener('mousemove', (e) => {
         const sparkle = document.createElement('div');
         sparkle.classList.add('sparkle');
@@ -165,4 +160,5 @@ function typeWriter() {
     }
 }
 
+// Start typing when page loads
 window.onload = typeWriter;
