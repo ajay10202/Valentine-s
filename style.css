@@ -8,70 +8,34 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden; 
-    background-color: #ff9a9e; /* Fallback */
-    touch-action: none; /* Disables scroll/zoom on mobile */
-}
-
-/* 0. START OVERLAY */
-#startOverlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    z-index: 99999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    cursor: pointer;
-    transition: opacity 0.5s ease;
-}
-.start-content { text-align: center; animation: pulse 2s infinite; }
-.start-content h1 { color: #ff4d6d; font-size: 3rem; }
-
-/* 1. AURORA BACKGROUND */
-.bg-gradient {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffd1ff, #fbc2eb);
     background-size: 400% 400%;
-    animation: gradientBG 10s ease infinite;
-    z-index: -2;
+    animation: gradientBG 15s ease infinite;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden; /* CRITICAL FOR MOBILE: Prevents scrolling */
+    perspective: 1000px;
+    touch-action: none; /* CRITICAL FOR MOBILE: Disables pinch zoom/scroll */
 }
+
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* 2. ROSE PETALS */
-.petal {
-    position: absolute;
-    background-color: #ff4d6d;
-    width: 15px;
-    height: 15px;
-    border-radius: 15px 0 15px 0;
-    z-index: -1;
-    opacity: 0.8;
-    animation: fall linear forwards;
-}
-@keyframes fall {
-    to { transform: translateY(110vh) rotate(720deg); }
-}
-
-/* 3. MAIN CARD */
+/* 3D TILT CONTAINER */
 .container {
     text-align: center;
     background: rgba(255, 255, 255, 0.90);
-    padding: 2.5rem;
+    padding: 3rem;
     border-radius: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     z-index: 10;
-    width: 85%;
+    width: 90%;
     max-width: 400px; 
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.8);
+    transform-style: preserve-3d;
     transition: transform 0.1s ease-out;
 }
 
@@ -81,36 +45,37 @@ body {
     max-width: 220px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateZ(30px);
 }
 
-h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 3rem; margin: 10px 0; line-height: 1.1; }
-h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; margin: 10px 0; }
-p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.5rem; font-weight: 600; }
+h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 3.5rem; margin: 10px 0; text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5); line-height: 1.1; min-height: 80px;}
+h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 3rem; margin: 10px 0; }
+p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.8rem; font-weight: 600; }
 
-/* 4. BUTTONS */
+/* BUTTONS */
 .btn-group {
     display: flex;
     justify-content: center;
     align-items: center; 
-    gap: 15px;
+    gap: 20px;
     margin-top: 25px;
-    height: 70px; /* Keeps layout stable */
-    position: relative; /* Context for absolute positioning */
+    height: 70px; /* Fixed height to prevent layout jumps */
+    transform: translateZ(40px);
+    position: relative;
 }
 
 button {
-    padding: 12px 30px;
+    padding: 15px 40px;
     font-size: 1.2rem;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    transition: all 0.2s ease; /* Fast transition */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     white-space: nowrap; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    -webkit-tap-highlight-color: transparent;
-    user-select: none; /* Prevents text selection on mobile */
+    -webkit-tap-highlight-color: transparent; /* Removes blue tap box on mobile */
 }
 
 #yesBtn {
@@ -118,33 +83,6 @@ button {
     color: white;
     z-index: 100;
     animation: heartbeat 1.5s infinite;
-}
-
-#noBtn {
-    background-color: #fff;
-    color: #888;
-    border: 1px solid #ddd;
-    position: relative; 
-    z-index: 9999;
-}
-
-/* 5. LOVE METER */
-.meter-container {
-    position: fixed;
-    top: 15px;
-    width: 85%;
-    max-width: 400px;
-    z-index: 1000;
-    text-align: center;
-}
-.meter-label { color: white; font-weight: bold; text-shadow: 0 2px 2px rgba(0,0,0,0.3); }
-.meter-bar-bg {
-    width: 100%; height: 12px; background: rgba(255, 255, 255, 0.5);
-    border-radius: 20px; overflow: hidden;
-}
-.meter-bar-fill {
-    width: 20%; height: 100%; background: linear-gradient(90deg, #ff9a9e, #ff0055);
-    transition: width 0.3s ease;
 }
 
 @keyframes heartbeat {
@@ -155,6 +93,90 @@ button {
     100% { transform: scale(1); }
 }
 
-@keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.8; transform: scale(1); } }
+#noBtn {
+    background-color: #fff;
+    color: #888;
+    border: 1px solid #ddd;
+    /* Important: position absolute will be set by JS, but we start relative */
+    z-index: 9999;
+}
 
-.hidden { display: none; }
+/* LOVE METER */
+.meter-container {
+    position: fixed;
+    top: 20px;
+    width: 85%;
+    max-width: 400px;
+    z-index: 1000;
+    text-align: center;
+}
+.meter-label {
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-size: 1.2rem;
+}
+.meter-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+.meter-bar-fill {
+    width: 30%; /* Starting value */
+    height: 100%;
+    background: linear-gradient(90deg, #ff9a9e, #ff0055);
+    transition: width 0.3s ease;
+}
+
+/* PARTICLES */
+.sparkle { 
+    position: fixed; 
+    width: 6px; 
+    height: 6px; 
+    background: #ffd700; 
+    border-radius: 50%; 
+    pointer-events: none;
+    z-index: 9999;
+    animation: fadeOut 0.8s forwards; 
+}
+
+.kiss { 
+    position: fixed; 
+    font-size: 2rem; 
+    pointer-events: none;
+    z-index: 9999;
+    animation: floatUp 3s forwards; 
+}
+
+@keyframes fadeOut { 100% { opacity: 0; transform: scale(0); } }
+@keyframes floatUp { 100% { transform: translateY(-100px); opacity: 0; } }
+
+.hidden { display: none !important; }
+
+/* --- RESPONSIVE ADJUSTMENTS (MOBILE VS PC) --- */
+@media (max-width: 600px) {
+    /* Adjust Container for smaller screens */
+    .container {
+        padding: 1.5rem;
+        width: 85%;
+    }
+    
+    /* Smaller Fonts for Mobile */
+    h1 { font-size: 2.2rem; min-height: 50px; }
+    h2 { font-size: 2rem; }
+    p { font-size: 1.2rem; }
+    
+    /* Smaller GIF */
+    .gif-container img { max-width: 150px; }
+    
+    /* Adjust Buttons for touch */
+    .btn-group { flex-direction: column; gap: 15px; height: auto; margin-top: 15px;}
+    button { width: 100%; padding: 12px 0; font-size: 1rem; }
+    
+    /* Disable 3D tilt on mobile to save battery and performance */
+    .container { transform: none !important; }
+}
