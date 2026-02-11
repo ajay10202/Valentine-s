@@ -6,29 +6,26 @@ const heartBg = document.getElementById('heartBg');
 const bgMusic = document.getElementById('bgMusic');
 const typewriterElement = document.getElementById('typewriterText');
 const mainGif = document.getElementById('mainGif');
+const mainContainer = document.getElementById('mainContainer');
+const flashOverlay = document.getElementById('flashOverlay');
 
-// --- 0. DATA ARRAYS ---
-// Taunts for the button text
+// --- DATA ---
 const taunts = [
     "No 💔", "Are you sure?", "Really?", "Think again!", 
     "Last chance!", "Have a heart!", "Don't do this!", "I'll cry!",
     "You're breaking my heart 💔", "Seriously? 🥺"
 ];
 
-// Sad GIFs for when they try to click No
 const sadGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/26BRL7YrutHKs/giphy.gif", // Sad Pikachu
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmM5c2g5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/d2lcHJy5yqg/giphy.gif", // Crying Cat
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/L95W4wv8nnb9K/giphy.gif", // Sad Stitch
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExazZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/OPU6wzx8JrHna/giphy.gif"  // Crying face
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/26BRL7YrutHKs/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmM5c2g5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/d2lcHJy5yqg/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaGZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/L95W4wv8nnb9K/giphy.gif"
 ];
 
-// Words that float up when No moves
 const pleadingTexts = [
     "Why? 🥺", "Please! 😭", "Don't!", "Ouch! 💔", 
     "Love me! ❤️", "Wait!", "Nooooo!"
 ];
-
 
 // --- 1. TYPING EFFECT ---
 const text = "Will you be my Valentine?";
@@ -43,19 +40,46 @@ function typeWriter() {
 window.onload = typeWriter;
 
 
-// --- 2. DYNAMIC "NO" BUTTON (THE CHAOS ENGINE) ---
+// --- 2. DYNAMIC "NO" BUTTON LOGIC ---
 let yesScale = 1; 
+let movesCount = 0; // Track how many times they tried to click No
 
 function moveNoButton(e) {
     if(e) e.preventDefault();
+    movesCount++;
 
-    // A. Move Button (Top Half Only)
+    // --- A. THE "I GIVE UP" MECHANIC ---
+    // After 6 tries, the button gives up and becomes a YES button
+    if (movesCount > 6) {
+        noBtn.innerText = "Okay fine... Yes! 💖";
+        noBtn.style.backgroundColor = "#ff4d6d";
+        noBtn.style.color = "white";
+        noBtn.style.transform = "scale(1.2)";
+        noBtn.style.position = "relative"; // Return to normal flow
+        noBtn.style.left = "auto";
+        noBtn.style.top = "auto";
+        
+        // Remove evasion listeners
+        noBtn.removeEventListener('mouseover', moveNoButton);
+        noBtn.removeEventListener('touchstart', moveNoButton);
+        noBtn.removeEventListener('click', moveNoButton);
+
+        // Add success listener
+        noBtn.addEventListener('click', () => {
+             // Simulate Yes Click
+             yesBtn.click();
+        });
+        
+        mainGif.src = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExazZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/OPU6wzx8JrHna/giphy.gif"; // Crying happy gif
+        return; // Stop the rest of the function
+    }
+
+    // --- B. MOVEMENT (Top Half Only) ---
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
     
-    // Limit to top 50% so it doesn't get too low
     const maxLeft = windowWidth - btnWidth - 30;
     const maxTop = (windowHeight / 2) - btnHeight - 20;
     
@@ -65,23 +89,24 @@ function moveNoButton(e) {
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomLeft + 'px';
     noBtn.style.top = randomTop + 'px';
+    
+    // Spin Effect: Add rotation based on even/odd move
+    const rotateAngle = (movesCount % 2 === 0) ? 20 : -20;
+    noBtn.style.transform = `rotate(${rotateAngle}deg)`;
 
-    // B. Change Text (Taunt)
+    // --- C. DYNAMIC EFFECTS ---
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
+    mainGif.src = sadGifs[Math.floor(Math.random() * sadGifs.length)];
 
-    // C. Change Main GIF to something sad
-    const randomGif = sadGifs[Math.floor(Math.random() * sadGifs.length)];
-    mainGif.src = randomGif;
-
-    // D. Grow Yes Button
+    // Grow Yes Button
     yesScale += 0.2; 
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // E. Spawn Floating Pleading Text
     spawnFloatingText(randomLeft, randomTop);
+    triggerShake();
+    triggerFlash();
 }
 
-// Function to create the floating text
 function spawnFloatingText(x, y) {
     const textEl = document.createElement('div');
     textEl.classList.add('floating-text');
@@ -89,12 +114,25 @@ function spawnFloatingText(x, y) {
     textEl.style.left = x + 'px';
     textEl.style.top = y + 'px';
     document.body.appendChild(textEl);
-    
-    // Remove after animation finishes
     setTimeout(() => textEl.remove(), 1500);
 }
 
-// Event Listeners
+// Shake the whole card
+function triggerShake() {
+    mainContainer.classList.add('shake-effect');
+    setTimeout(() => {
+        mainContainer.classList.remove('shake-effect');
+    }, 500);
+}
+
+// Flash the background red slightly
+function triggerFlash() {
+    flashOverlay.style.opacity = '1';
+    setTimeout(() => {
+        flashOverlay.style.opacity = '0';
+    }, 200);
+}
+
 noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
@@ -105,18 +143,13 @@ yesBtn.addEventListener('click', () => {
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
 
-    // Play Music
     bgMusic.volume = 0.5; 
     bgMusic.play().catch(e => console.log("Audio play failed", e));
-
-    // Restore Happy GIF if it was changed to sad
-    // (Note: The success HTML already has a different happy gif, so this is handled by the HTML structure)
     
     createConfetti();
 });
 
-
-// --- 4. BROWSER TAB TITLE TRICK ---
+// --- 4. BROWSER TAB TITLE ---
 document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
         document.title = "Don't leave me! 💔";
@@ -124,7 +157,6 @@ document.addEventListener("visibilitychange", function() {
         document.title = "Be My Valentine? 🌹";
     }
 });
-
 
 // --- 5. CURSOR TRAIL ---
 document.addEventListener('mousemove', function(e){
@@ -144,7 +176,6 @@ function createTrailHeart(x, y) {
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 1000);
 }
-
 
 // --- 6. BACKGROUND HEARTS ---
 function createHeart() {
