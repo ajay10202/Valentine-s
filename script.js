@@ -4,28 +4,58 @@ const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const heartBg = document.getElementById('heartBg');
 const bgMusic = document.getElementById('bgMusic');
+const typewriterElement = document.getElementById('typewriterText');
 
-// --- 1. "NO" BUTTON MOVES UP ONLY ---
+// --- 1. TYPING EFFECT FOR HEADER ---
+const text = "Will you be my Valentine?";
+let index = 0;
+
+function typeWriter() {
+    if (index < text.length) {
+        typewriterElement.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(typeWriter, 100); // Speed of typing
+    }
+}
+// Start typing when page loads
+window.onload = typeWriter;
+
+
+// --- 2. DYNAMIC "NO" BUTTON (TAUNT + MOVE) ---
+const taunts = [
+    "No 💔", "Too slow! 😜", "Missed me! 💨", "Try again! 😂", 
+    "Nice try! 😏", "Oop! 🙊", "Catch me! 🏃", "So close! 🤏",
+    "Nope! 🚫", "Seriously? 🤨"
+];
+
+let yesScale = 1; // Current size of Yes button
+
 function moveNoButton(e) {
     if(e) e.preventDefault();
 
+    // A. Move the button (Top Half Only)
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
 
-    // Horizontal: Anywhere on screen (minus padding)
     const maxLeft = windowWidth - btnWidth - 20;
+    const maxTop = (windowHeight / 2) - btnHeight; // Upper 50% limit
+    
     const randomLeft = Math.max(10, Math.random() * maxLeft);
-
-    // Vertical: ONLY UPPER HALF
-    // We limit the movement to the top 50% of the screen so it's not "too low"
-    const maxTop = (windowHeight / 2) - btnHeight; 
     const randomTop = Math.max(10, Math.random() * maxTop);
 
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomLeft + 'px';
     noBtn.style.top = randomTop + 'px';
+
+    // B. Change Text (Taunt)
+    const randomTaunt = taunts[Math.floor(Math.random() * taunts.length)];
+    noBtn.innerText = randomTaunt;
+
+    // C. Grow the Yes Button
+    yesScale += 0.15; // Increase size by 15% each time
+    yesBtn.style.transform = `scale(${yesScale})`;
 }
 
 noBtn.addEventListener('mouseover', moveNoButton);
@@ -33,22 +63,42 @@ noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 
 
-// --- 2. "YES" BUTTON & MUSIC ---
+// --- 3. YES BUTTON & SUCCESS ---
 yesBtn.addEventListener('click', () => {
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
 
-    // Play Music
     bgMusic.volume = 0.5; 
-    bgMusic.play().catch(error => {
-        console.log("Music play failed:", error);
-    });
+    bgMusic.play().catch(error => console.log("Music play failed:", error));
 
     createConfetti();
 });
 
 
-// --- 3. BACKGROUND EFFECTS ---
+// --- 4. CURSOR TRAIL EFFECT ---
+document.addEventListener('mousemove', function(e){
+    createTrailHeart(e.pageX, e.pageY);
+});
+
+document.addEventListener('touchmove', function(e){
+    createTrailHeart(e.touches[0].pageX, e.touches[0].pageY);
+});
+
+function createTrailHeart(x, y) {
+    const heart = document.createElement('div');
+    heart.classList.add('trail-heart');
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    heart.style.transform = 'rotate(45deg)'; // Heart shape needs rotation
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+        heart.remove();
+    }, 1000);
+}
+
+
+// --- 5. BACKGROUND EFFECTS ---
 function createHeart() {
     const heart = document.createElement('div');
     heart.classList.add('heart');
