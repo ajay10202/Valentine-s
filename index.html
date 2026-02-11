@@ -10,29 +10,23 @@
 </head>
 <body>
 
-    <div id="startOverlay">
-        <div class="start-content">
-            <h1>Tap to Enter ❤️</h1>
-            <p>(Turn up your volume! 🔊)</p>
-        </div>
-    </div>
-
-    <audio id="noSound" loop preload="auto">
+    <audio id="noSound" preload="auto">
         <source src="no.mp3" type="audio/mp3">
     </audio>
+
     <audio id="yesSound" loop preload="auto">
         <source src="yes.mp3" type="audio/mp3">
     </audio>
 
-    <div class="bg-gradient"></div>
-    <div id="petalsContainer"></div>
-
     <div class="meter-container">
         <div class="meter-label">Love Meter ❤️</div>
         <div class="meter-bar-bg">
-            <div id="loveMeterBar" class="meter-bar-fill"></div>
+            <div id="loveMeterBar" class="meter-bar-fill" style="width: 100%;"></div>
         </div>
     </div>
+
+    <div id="flashOverlay"></div>
+    <div class="heart-bg" id="heartBg"></div>
     
     <div class="container" id="mainContainer">
         
@@ -52,7 +46,7 @@
 
         <div id="successSection" class="hidden">
             <div class="gif-container">
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
             </div>
             <h2>I Love You Di Pondati 🩵💛</h2>
             <p class="romantic-msg">You are my today and all of my tomorrows. 💋</p>
