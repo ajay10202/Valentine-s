@@ -34,34 +34,27 @@ function moveNoButton(e) {
         noSound.play();
     }
 
-    // Grow Yes
+    // Grow Yes Button
     yesScale += 0.1;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // --- NEW CENTERED MATH ---
-    // Instead of the whole screen, we define a "Movement Box" in the center
-    const moveRange = 150; // Pixels to move from center
+    // Movement Range (Center Box)
+    const moveRange = 150; // How far from center it can go
     
-    // Get center of screen
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    
-    // Get button size
     const btnW = noBtn.offsetWidth;
     const btnH = noBtn.offsetHeight;
 
-    // Calculate new position relative to center
-    // (Math.random() - 0.5) gives a number between -0.5 and 0.5
-    // Multiply by moveRange * 2 to span full left/right range
+    // Calculate random position around the center
     const randomX = (centerX - (btnW / 2)) + ((Math.random() - 0.5) * moveRange * 2);
     const randomY = (centerY - (btnH / 2)) + ((Math.random() - 0.5) * moveRange * 2);
 
-    // Apply position
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomX + 'px';
     noBtn.style.top = randomY + 'px';
     
-    // Rotate slightly for effect
+    // Slight rotation
     const rotate = Math.random() * 20 - 10;
     noBtn.style.transform = `rotate(${rotate}deg)`;
 }
@@ -105,7 +98,6 @@ function createConfetti() {
         confetti.style.left = Math.random() * 100 + 'vw';
         confetti.style.top = '-50px';
         confetti.style.fontSize = '2rem';
-        // Add style tag for animation if needed or rely on JS loop
         confetti.animate([
             { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
             { transform: 'translateY(110vh) rotate(360deg)', opacity: 0 }
