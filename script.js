@@ -11,7 +11,7 @@ const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// PHONE NUMBER CONFIG (Add yours here!)
+// PHONE NUMBER CONFIG
 const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
@@ -31,11 +31,31 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
-        setInterval(createPetalOrPhoto, 300); // Mixed petals and photos
+        setInterval(createPetalOrPhoto, 300);
     }, 500);
 });
 
-// --- 2. DYNAMIC TITLE (Come Back Feature) ---
+// --- 2. CURSOR HEART TRAIL ---
+// Replaced Magic Dust with Hearts
+document.addEventListener('mousemove', createHeartTrail);
+document.addEventListener('touchmove', (e) => {
+    createHeartTrail(e.touches[0]);
+});
+
+function createHeartTrail(e) {
+    const heart = document.createElement('div');
+    heart.classList.add('cursor-heart');
+    heart.innerHTML = '❤️';
+    heart.style.left = e.pageX + 'px';
+    heart.style.top = e.pageY + 'px';
+    document.body.appendChild(heart);
+    
+    setTimeout(() => {
+        heart.remove();
+    }, 1000);
+}
+
+// --- 3. DYNAMIC TITLE ---
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         document.title = "Miss you already! 💔";
@@ -44,9 +64,8 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// --- 3. HEART BURST (Interactive Background) ---
+// --- 4. HEART BURST (On Click) ---
 document.addEventListener('click', (e) => {
-    // Create 5 hearts at click position
     for(let i=0; i<5; i++) {
         const heart = document.createElement('div');
         heart.classList.add('heart-burst');
@@ -60,17 +79,16 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// --- 4. NO BUTTON LOGIC (Fixed Audio & Chaos) ---
+// --- 5. NO BUTTON LOGIC ---
 function moveNoButton(e) {
     if(e) e.preventDefault(); 
 
     if (isAudioUnlocked) {
-        noSound.currentTime = 0; // RESET sound to start
+        noSound.currentTime = 0; 
         noSound.volume = 0.5;
-        noSound.play(); // Play once per click
+        noSound.play(); 
     }
 
-    // Decoy Effect
     const decoy = document.createElement('button');
     decoy.innerHTML = "No 💔";
     decoy.className = 'decoy-btn';
@@ -85,11 +103,9 @@ function moveNoButton(e) {
     }, 10);
     setTimeout(() => decoy.remove(), 1000);
 
-    // Shrink/Grow logic
     if (noScale > 0.6) { noScale -= 0.05; noBtn.style.transform = `scale(${noScale})`; }
     yesScale += 0.1; yesBtn.style.transform = `scale(${yesScale})`;
 
-    // Move Logic
     const maxX = window.innerWidth - noBtn.offsetWidth - 20;
     const maxY = window.innerHeight - noBtn.offsetHeight - 20;
     noBtn.style.position = 'fixed';
@@ -106,7 +122,7 @@ noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 
-// --- 5. YES BUTTON & CONFETTI ---
+// --- 6. YES BUTTON & CONFETTI ---
 yesBtn.addEventListener('click', () => {
     if(isAudioUnlocked) {
         noSound.pause();
@@ -119,9 +135,8 @@ yesBtn.addEventListener('click', () => {
     loveScore = 100;
     loveMeterBar.style.width = "100%";
     
-    startConfetti(); // Trigger Confetti
+    startConfetti(); 
 
-    // Romantic Rain (Hearts & Roses)
     setInterval(() => {
         const item = document.createElement('div');
         item.innerHTML = Math.random() > 0.5 ? '❤️' : '🌹';
@@ -135,14 +150,13 @@ yesBtn.addEventListener('click', () => {
     }, 200);
 });
 
-// --- 6. FLOATING PHOTOS & PETALS ---
+// --- 7. FLOATING PHOTOS & PETALS ---
 function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; // 20% chance to be a photo
+    const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
     
     if (isPhoto) {
         element.classList.add('floating-photo');
-        // PLACEHOLDER IMAGES - Replace strings with your own image paths if needed
         const photos = [
             "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif",
             "https://media.giphy.com/media/l0HlO3BJ8LALPW4sE/giphy.gif"
@@ -162,13 +176,13 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), 5000);
 }
 
-// --- 7. DATE PICKER & WHATSAPP ---
+// --- 8. DATE & WHATSAPP ---
 dateInput.addEventListener('change', (e) => {
     const date = e.target.value;
     whatsappBtn.href = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
 });
 
-// --- 8. TYPEWRITER ---
+// --- 9. TYPEWRITER ---
 const text = "Will you be my Valentine?";
 let index = 0;
 function typeWriter() {
@@ -179,7 +193,7 @@ function typeWriter() {
     }
 }
 
-// --- 9. CONFETTI ENGINE (Mini Library) ---
+// --- 10. CONFETTI ---
 function startConfetti() {
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
@@ -205,8 +219,8 @@ function startConfetti() {
         particles.forEach((p, index) => {
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.2; // Gravity
-            p.size *= 0.96; // Shrink
+            p.vy += 0.2; 
+            p.size *= 0.96; 
             
             ctx.fillStyle = p.color;
             ctx.beginPath();
@@ -218,4 +232,4 @@ function startConfetti() {
         if(particles.length > 0) requestAnimationFrame(animate);
     }
     animate();
-}
+                          }
