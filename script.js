@@ -3,33 +3,26 @@ const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const loveMeterBar = document.getElementById('loveMeterBar');
-
-// AUDIO ELEMENTS
-const bgMusic = document.getElementById('bgMusic');
 const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
-
 const startOverlay = document.getElementById('startOverlay');
 const petalsContainer = document.getElementById('petalsContainer');
 const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// CONFIG
-const myPhoneNumber = "916380052805"; 
+// --- CONFIGURATION ---
+// IMPORTANT: Enter your number here! (No +, no spaces)
+const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
 let yesClickCount = 0; 
 let loveScore = 0; 
 const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
-// 1. START & AUDIO UNLOCK
+// --- 1. START OVERLAY (Audio Unlock) ---
 startOverlay.addEventListener('click', () => {
-    // Unlock and play Background Music
-    bgMusic.volume = 0.5;
-    bgMusic.play().catch(e => console.log("Audio play error", e));
-
-    // Unlock other sounds (Play/Pause trick)
+    // Play and immediately pause to unlock AudioContext
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
@@ -40,12 +33,12 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
+        // Start background rain
         setInterval(createPetalOrPhoto, 300);
-        setInterval(createLivestreamHeart, 600);
     }, 500);
 });
 
-// 2. DYNAMIC CURSOR TRAIL
+// --- 2. DYNAMIC CURSOR TRAIL (Mixed Emojis) ---
 document.addEventListener('mousemove', (e) => {
     createCursorTrail(e.clientX, e.clientY);
 });
@@ -56,115 +49,25 @@ document.addEventListener('touchmove', (e) => {
 function createCursorTrail(x, y) {
     const item = document.createElement('div');
     item.classList.add('cursor-item');
+    
     const emojis = ['❤️', '✨', '💖', '🌹', '🦋', '💋'];
     item.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    
     const offsetX = (Math.random() - 0.5) * 20;
     const offsetY = (Math.random() - 0.5) * 20;
+    
     item.style.left = (x + offsetX) + 'px';
     item.style.top = (y + offsetY) + 'px';
+    
     document.body.appendChild(item);
     setTimeout(() => item.remove(), 1500);
 }
 
-// 3. LIVESTREAM HEARTS
-function createLivestreamHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('stream-heart');
-    const emojis = ['❤️', '🧡', '💛', '💚', '💙', '💜', '💖'];
-    heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-    heart.style.right = (20 + Math.random() * 50) + 'px';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 4000);
-}
-
-// 4. YES BUTTON GAME LOGIC
-yesBtn.addEventListener('click', (e) => {
-    yesClickCount++;
-    const floatText = document.createElement('div');
-    floatText.classList.add('float-text');
-    floatText.innerText = "+25% Love! 💘";
-    const rect = yesBtn.getBoundingClientRect();
-    floatText.style.left = rect.left + 'px';
-    floatText.style.top = rect.top + 'px';
-    document.body.appendChild(floatText);
-    setTimeout(() => floatText.remove(), 1000);
-
-    loveScore += 25;
-    loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
-
-    if (yesClickCount < 4) {
-        yesBtn.innerText = yesTexts[yesClickCount];
-        createHeartBurst(e.clientX, e.clientY);
-    } 
-    else {
-        // SUCCESS PHASE
-        if(isAudioUnlocked) {
-            bgMusic.pause(); // Stop BG music
-            noSound.pause();
-            yesSound.volume = 0.8;
-            yesSound.play(); // Play Celebration
-        }
-        document.body.classList.add('shake');
-        setTimeout(() => {
-            document.body.classList.remove('shake');
-            questionSection.classList.add('hidden');
-            successSection.classList.remove('hidden');
-            startConfetti(); 
-            startRomanticRain();
-        }, 500);
-    }
-});
-
-// 5. NO BUTTON LOGIC (SAFE ZONE MATH)
-function moveNoButton() {
-    if (isAudioUnlocked) {
-        noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
-    }
-
-    // Smoke Puff
-    const rect = noBtn.getBoundingClientRect();
-    const puff = document.createElement('div');
-    puff.classList.add('smoke-puff');
-    puff.style.left = rect.left + 'px';
-    puff.style.top = rect.top + 'px';
-    document.body.appendChild(puff);
-    setTimeout(() => puff.remove(), 500);
-
-    // --- SAFE MATH START ---
-    const winWidth = window.innerWidth;
-    const winHeight = window.innerHeight;
-    const btnWidth = noBtn.offsetWidth;
-    const btnHeight = noBtn.offsetHeight;
-
-    // Safety padding (30px)
-    const padding = 30;
-
-    // Max allowable Left and Top
-    const maxLeft = winWidth - btnWidth - padding;
-    const maxTop = winHeight - btnHeight - padding;
-
-    // Generate random within padding and max
-    const randomLeft = Math.random() * (maxLeft - padding) + padding;
-    const randomTop = Math.random() * (maxTop - padding) + padding;
-    // --- SAFE MATH END ---
-
-    noBtn.style.position = 'fixed';
-    noBtn.style.left = randomLeft + 'px';
-    noBtn.style.top = randomTop + 'px';
-    
-    const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
-    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
-}
-
-noBtn.addEventListener('mouseover', moveNoButton);
-noBtn.addEventListener('click', moveNoButton);
-noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
-
-
-// 6. UTILS & ANIMATIONS
+// --- 3. BACKGROUND RAIN (Swaying & Depth) ---
 function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; 
+    const isPhoto = Math.random() < 0.2; // 20% chance of photo
     const element = document.createElement('div');
+    
     if (isPhoto) {
         element.classList.add('floating-photo');
         const photos = [
@@ -179,6 +82,8 @@ function createPetalOrPhoto() {
         element.classList.add('petal');
         element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e', '#ffd166'][Math.floor(Math.random()*4)];
     }
+
+    // Random Size & Depth
     const size = Math.random() * 20 + 10; 
     element.style.width = isPhoto ? '50px' : `${size}px`;
     element.style.height = isPhoto ? 'auto' : `${size}px`;
@@ -193,15 +98,82 @@ function createPetalOrPhoto() {
         element.style.zIndex = "-1";
     }
 
-    const duration = Math.random() * 5 + 5; 
+    // Animation Style
+    const duration = Math.random() * 5 + 5;
     const animations = ['fall-straight', 'fall-sway-left', 'fall-sway-right'];
     const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    
     element.style.animation = `${randomAnim} ${duration}s linear forwards`;
     element.style.left = Math.random() * 100 + "vw";
+
     petalsContainer.appendChild(element);
     setTimeout(() => element.remove(), duration * 1000);
 }
 
+// --- 4. YES BUTTON GAME (4 Clicks) ---
+yesBtn.addEventListener('click', (e) => {
+    yesClickCount++;
+    
+    // Floating Text
+    const floatText = document.createElement('div');
+    floatText.classList.add('float-text');
+    floatText.innerText = "+25% Love! 💘";
+    const rect = yesBtn.getBoundingClientRect();
+    floatText.style.left = rect.left + 'px';
+    floatText.style.top = rect.top + 'px';
+    document.body.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 1000);
+
+    // Meter Update
+    loveScore += 25;
+    loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
+
+    if (yesClickCount < 4) {
+        yesBtn.innerText = yesTexts[yesClickCount];
+        createHeartBurst(e.clientX, e.clientY);
+    } 
+    else {
+        // SUCCESS
+        if(isAudioUnlocked) {
+            noSound.pause();
+            yesSound.volume = 0.8;
+            yesSound.play();
+        }
+        document.body.classList.add('shake');
+        setTimeout(() => {
+            document.body.classList.remove('shake');
+            questionSection.classList.add('hidden');
+            successSection.classList.remove('hidden');
+            startConfetti(); 
+            startRomanticRain();
+        }, 500);
+    }
+});
+
+// --- 5. NO BUTTON LOGIC (Safe Center Zone) ---
+function moveNoButton() {
+    if (isAudioUnlocked) {
+        noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
+    }
+    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
+    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
+    
+    // Move 100px around center
+    const spread = 100; 
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const randomX = (Math.random() * spread * 2) - spread;
+    const randomY = (Math.random() * spread * 2) - spread;
+
+    noBtn.style.position = 'fixed';
+    noBtn.style.left = (centerX + randomX) + 'px';
+    noBtn.style.top = (centerY + randomY) + 'px';
+}
+noBtn.addEventListener('mouseover', moveNoButton);
+noBtn.addEventListener('click', moveNoButton);
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
+
+// --- 6. WHATSAPP LOGIC ---
 whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
@@ -213,6 +185,7 @@ whatsappBtn.addEventListener('click', (e) => {
     }
 });
 
+// --- UTILS ---
 function createHeartBurst(x, y) {
     for(let i=0; i<8; i++) {
         const heart = document.createElement('div');
