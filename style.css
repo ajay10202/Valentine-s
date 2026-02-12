@@ -10,25 +10,10 @@ body {
     overflow: hidden; 
     background-color: #ff9a9e;
     touch-action: none; user-select: none;
-    /* Custom Cursor SVG */
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff0055"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
 }
 
-/* --- FONTS & TEXT STYLES --- */
-h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 2.8rem; margin: 10px 0; line-height: 1.1; }
-h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; margin: 10px 0; }
-.romantic-msg { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.6rem; font-weight: 600; }
-
-/* The "Normal" readable font you requested */
-.normal-text {
-    font-family: 'Poppins', sans-serif !important;
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #c0392b;
-    margin: 10px 0;
-}
-
-/* --- CURSOR TRAIL ANIMATION --- */
+/* --- 1. NEW ROMANTIC CURSOR TRAIL --- */
 .cursor-item {
     position: absolute; pointer-events: none;
     font-size: 24px; z-index: 9999;
@@ -41,11 +26,18 @@ h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; mar
     100% { transform: translateY(-50px) scale(1.2) rotate(45deg); opacity: 0; }
 }
 
-/* --- BACKGROUND RAIN (SWAYING) --- */
+/* --- 2. DYNAMIC BACKGROUND RAIN (Swaying) --- */
 .petal, .floating-photo {
-    position: absolute; z-index: -1; top: -10vh;
+    position: absolute;
+    z-index: -1;
+    top: -10vh; /* Start above screen */
+    /* Animation name is set in JS to randomize sway */
 }
-@keyframes fall-straight { to { transform: translateY(120vh) rotate(720deg); } }
+
+/* Three different fall patterns for variety */
+@keyframes fall-straight {
+    to { transform: translateY(120vh) rotate(720deg); }
+}
 @keyframes fall-sway-left {
     0% { transform: translateY(-10vh) translateX(0) rotate(0deg); }
     50% { transform: translateY(50vh) translateX(-50px) rotate(180deg); }
@@ -57,10 +49,35 @@ h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; mar
     100% { transform: translateY(120vh) translateX(0) rotate(-360deg); }
 }
 
-.petal { background-color: #ff4d6d; border-radius: 100% 0 100% 0; }
-.floating-photo { border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.petal { 
+    background-color: #ff4d6d; 
+    border-radius: 100% 0 100% 0; /* Leaf shape */
+}
+.floating-photo {
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
 
-/* --- UI ELEMENTS --- */
+/* --- REST OF STYLES (Unchanged) --- */
+.float-text {
+    position: absolute; pointer-events: none;
+    color: #ff0055; font-weight: bold; font-size: 1.5rem;
+    animation: floatUpFade 1s ease-out forwards;
+    z-index: 10000; text-shadow: 0 2px 5px rgba(255,255,255,0.8);
+}
+@keyframes floatUpFade {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-50px); opacity: 0; }
+}
+
+.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
 #startOverlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.9); z-index: 99999;
@@ -68,6 +85,28 @@ h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; mar
     color: white; cursor: pointer; transition: opacity 0.5s ease;
 }
 .start-content { text-align: center; animation: pulse 2s infinite; }
+
+#confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+.bg-gradient {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite; z-index: -2;
+}
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.heart-burst {
+    position: absolute; color: #ff0055; font-size: 20px; pointer-events: none;
+    animation: burst 1s ease-out forwards; z-index: 9999;
+}
+@keyframes burst {
+    0% { transform: scale(0) translate(0, 0); opacity: 1; }
+    100% { transform: scale(1.5) translate(var(--tx), var(--ty)); opacity: 0; }
+}
 
 .container {
     text-align: center; background: rgba(255, 255, 255, 0.90);
@@ -78,6 +117,9 @@ h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; mar
     border: 2px solid rgba(255, 255, 255, 0.8); position: relative;
 }
 .gif-container img { width: 100%; max-width: 200px; border-radius: 20px; }
+h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 2.8rem; margin: 10px 0; line-height: 1.1; }
+h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; margin: 10px 0; }
+p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.5rem; font-weight: 600; }
 
 .btn-group {
     display: flex; justify-content: center; align-items: center; 
@@ -98,21 +140,10 @@ button {
     background-color: #fff; color: #888; border: 1px solid #ddd;
     position: relative; z-index: 9999;
 }
-
-.float-text {
-    position: absolute; pointer-events: none;
-    color: #ff0055; font-weight: bold; font-size: 1.5rem;
-    animation: floatUpFade 1s ease-out forwards;
-    z-index: 10000; text-shadow: 0 2px 5px rgba(255,255,255,0.8);
-}
-@keyframes floatUpFade { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
-
-.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-@keyframes shake {
-    10%, 90% { transform: translate3d(-1px, 0, 0); }
-    20%, 80% { transform: translate3d(2px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-    40%, 60% { transform: translate3d(4px, 0, 0); }
+.decoy-btn {
+    padding: 12px 25px; font-size: 1.1rem; border-radius: 50px;
+    background-color: #ccc; color: white; border: none;
+    z-index: 9998; position: fixed; pointer-events: none;
 }
 
 .date-picker-container { margin-top: 20px; }
@@ -131,19 +162,10 @@ input[type="date"] {
     position: fixed; top: 15px; left: 50%; transform: translateX(-50%); 
     width: 85%; max-width: 400px; z-index: 1000; text-align: center; 
 }
-.meter-label { color: white; font-weight: bold; text-shadow: 0 2px 2px rgba(0,0,0,0.3); font-family: 'Poppins', sans-serif; }
+.meter-label { color: white; font-weight: bold; text-shadow: 0 2px 2px rgba(0,0,0,0.3); }
 .meter-bar-bg { width: 100%; height: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 20px; overflow: hidden; margin-top: 5px; }
 .meter-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #ff9a9e, #ff0055); transition: width 0.3s ease; }
 
-.bg-gradient {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
-    background-size: 400% 400%; animation: gradientBG 10s ease infinite; z-index: -2;
-}
-@keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 45% { transform: scale(1.05); } 100% { transform: scale(1); } }
 @keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.8; transform: scale(1); } }
-#confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
-.heart-burst { position: absolute; color: #ff0055; font-size: 20px; pointer-events: none; animation: burst 1s ease-out forwards; z-index: 9999; }
-@keyframes burst { 0% { transform: scale(0) translate(0, 0); opacity: 1; } 100% { transform: scale(1.5) translate(var(--tx), var(--ty)); opacity: 0; } }
 .hidden { display: none; }
