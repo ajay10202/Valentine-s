@@ -11,8 +11,9 @@ const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// CONFIG
-const myPhoneNumber = "919999999999"; 
+// --- 🔧 CONFIGURATION ---
+// Your Phone Number (Correctly Formatted)
+const myPhoneNumber = "916380052805"; 
 
 let isAudioUnlocked = false;
 let yesClickCount = 0; 
@@ -136,8 +137,6 @@ function moveNoButton() {
     noBtn.style.left = (centerX + randomX) + 'px';
     noBtn.style.top = (centerY + randomY) + 'px';
     
-    // NOTE: We are NOT changing scale here. Button stays big.
-    
     // Funny Texts
     const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
@@ -189,10 +188,13 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), duration * 1000);
 }
 
+// --- 7. WHATSAPP LOGIC ---
 whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
+    
     if (date) {
+        // Updated URL Construction
         const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
         window.open(url, '_blank');
     } else {
