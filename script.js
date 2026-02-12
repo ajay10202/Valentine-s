@@ -2,148 +2,171 @@ const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
-const mainContainer = document.getElementById('mainContainer');
 const loveMeterBar = document.getElementById('loveMeterBar');
-const mainGif = document.getElementById('mainGif');
-
-// --- AUDIO ELEMENTS ---
 const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
+const startOverlay = document.getElementById('startOverlay');
+const petalsContainer = document.getElementById('petalsContainer');
+const typewriterElement = document.getElementById('typewriterText');
 
-let isNoMusicPlaying = false;
-
-// --- DYNAMIC VARIABLES ---
+let isAudioUnlocked = false;
 let yesScale = 1; 
 let noScale = 1;
-let loveScore = 20; // Starts at 20%
-const cuteGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYzhjOTZlNjUzZmYxZDRiNzM5MGNmODk4MzRjZWMzYWM2M2U5YzYwZCZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PXM/JTj1b7i2V218n1gU9N/giphy.gif",
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExazZ5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/OPU6wzx8JrHna/giphy.gif",
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z5Y3h6bGd4M3Z5Y3h6bGd4M3Z5Y3h6bGd4/26BRL7YrutHKs/giphy.gif"
-];
-const taunts = ["Too slow! 😜", "Try again! 🐢", "Love me! 🥺", "Can't catch me! 🏃", "Sullu po! 😂"];
+let loveScore = 30;
 
-// --- 1. 3D TILT EFFECT ---
-document.addEventListener('mousemove', (e) => {
-    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-    mainContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+// --- 1. START OVERLAY (Audio Unlock & Init) ---
+startOverlay.addEventListener('click', () => {
+    // Unlock Audio Context (Play then immediately pause)
+    noSound.play().catch(e => console.log("Audio waiting interaction"));
+    noSound.pause();
+    yesSound.play().catch(e => console.log("Audio waiting interaction"));
+    yesSound.pause();
+    
+    // Fade out overlay
+    startOverlay.style.opacity = '0';
+    setTimeout(() => {
+        startOverlay.style.display = 'none';
+        isAudioUnlocked = true;
+        
+        // Start Animations
+        typeWriter();
+        setInterval(createPetal, 300);
+    }, 500);
 });
 
-// --- 2. MOVE "NO" BUTTON (Unlimited) ---
+// --- 2. NO BUTTON RUNAWAY & CHAOS LOGIC ---
 function moveNoButton(e) {
-    if(e) e.preventDefault();
+    if(e) e.preventDefault(); // Stop default touch actions
 
-    // START NO MUSIC (If not already playing)
-    if (!isNoMusicPlaying) {
+    // Play "No" sound if unlocked
+    if (isAudioUnlocked) {
+        noSound.currentTime = 0;
         noSound.volume = 0.5;
-        noSound.play().catch(e => console.log("Interaction needed for audio"));
-        isNoMusicPlaying = true;
+        noSound.play();
     }
 
-    // Shrink No
-    if (noScale > 0.5) {
+    // Shrink "No" / Grow "Yes"
+    if (noScale > 0.6) {
         noScale -= 0.05;
         noBtn.style.transform = `scale(${noScale})`;
     }
-
-    // Grow Yes
-    yesScale += 0.2;
+    yesScale += 0.1;
     yesBtn.style.transform = `scale(${yesScale})`;
 
-    // Move Logic
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const btnW = noBtn.offsetWidth;
-    const btnH = noBtn.offsetHeight;
+    // --- CHAOS MODE: Create Decoy Button ---
+    const decoy = document.createElement('button');
+    decoy.innerHTML = "No 💔";
+    decoy.className = 'decoy-btn';
+    // Set decoy to where the real button CURRENTLY is
+    const rect = noBtn.getBoundingClientRect();
+    decoy.style.left = rect.left + 'px';
+    decoy.style.top = rect.top + 'px';
+    document.body.appendChild(decoy);
+
+    // Decoy falls and fades
+    setTimeout(() => {
+        decoy.style.transform = "translateY(50px) rotate(20deg)";
+        decoy.style.opacity = "0";
+    }, 10);
+    setTimeout(() => decoy.remove(), 1000);
+
+    // --- MOVE REAL BUTTON ---
+    const winWidth = window.innerWidth;
+    const winHeight = window.innerHeight;
+    const btnWidth = noBtn.offsetWidth;
+    const btnHeight = noBtn.offsetHeight;
+
+    // Keep button 20px from edges
+    const maxLeft = winWidth - btnWidth - 20;
+    const maxTop = winHeight - btnHeight - 20;
     
-    // Random Position
-    const randomLeft = Math.max(20, Math.random() * (w - btnW - 20));
-    const randomTop = Math.max(20, Math.random() * (h * 0.8 - btnH));
+    const randomLeft = Math.max(10, Math.random() * maxLeft);
+    const randomTop = Math.max(10, Math.random() * maxTop);
 
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomLeft + 'px';
     noBtn.style.top = randomTop + 'px';
-    
-    // Taunt Text
-    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
-    
-    // Change GIF randomly
-    mainGif.src = cuteGifs[Math.floor(Math.random() * cuteGifs.length)];
 
-    // Penalty Love Meter
+    // Change Text
+    const taunts = ["Too slow! 😜", "Try again! 🐢", "Love me! 🥺", "Missed! 💨", "Sullu po! 😂"];
+    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
+
+    // Drain Love Meter
     loveScore = Math.max(0, loveScore - 5);
-    updateLoveMeter();
+    loveMeterBar.style.width = loveScore + "%";
 }
 
-// Event Listeners for No
+// Add Listeners
 noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 
-// --- 3. YES BUTTON (Success) ---
+// --- 3. YES BUTTON LOGIC ---
 yesBtn.addEventListener('click', () => {
-    // Stop No Music
-    noSound.pause();
-    noSound.currentTime = 0;
+    if(isAudioUnlocked) {
+        noSound.pause();
+        yesSound.volume = 0.8;
+        yesSound.play();
+    }
 
-    // Play Yes Music
-    yesSound.volume = 0.6;
-    yesSound.play();
-
-    // Show Success
     questionSection.classList.add('hidden');
     successSection.classList.remove('hidden');
 
-    // Max Love Meter
     loveScore = 100;
-    updateLoveMeter();
+    loveMeterBar.style.width = "100%";
 
     // Rain Kisses
-    setInterval(createKiss, 200);
+    setInterval(() => {
+        const kiss = document.createElement('div');
+        kiss.innerHTML = '💋';
+        kiss.style.position = 'fixed';
+        kiss.style.fontSize = '2rem';
+        kiss.style.left = Math.random() * 100 + "vw";
+        kiss.style.top = '-50px';
+        kiss.style.animation = 'fall 3s linear forwards';
+        document.body.appendChild(kiss);
+        setTimeout(() => kiss.remove(), 3000);
+    }, 200);
 });
 
-// --- 4. LOVE METER ---
-function updateLoveMeter() {
-    loveMeterBar.style.width = loveScore + "%";
-}
-// Increase on Yes Hover
-yesBtn.addEventListener('mouseover', () => {
-    loveScore = Math.min(100, loveScore + 10);
-    updateLoveMeter();
+// --- 4. MAGIC DUST (Cursor Trail) ---
+document.addEventListener('mousemove', createSparkle);
+document.addEventListener('touchmove', (e) => {
+    createSparkle(e.touches[0]);
 });
 
-// --- 5. EFFECTS ---
-function createKiss() {
-    const kiss = document.createElement('div');
-    kiss.classList.add('kiss');
-    kiss.innerText = '💋';
-    kiss.style.left = Math.random() * 100 + "vw";
-    kiss.style.top = '-50px';
-    document.body.appendChild(kiss);
-    setTimeout(() => kiss.remove(), 3000);
+function createSparkle(e) {
+    const particle = document.createElement('div');
+    particle.classList.add('magic-particle');
+    
+    const size = Math.random() * 10 + 5; 
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    
+    particle.style.left = `${e.pageX}px`;
+    particle.style.top = `${e.pageY}px`;
+    
+    document.body.appendChild(particle);
+    
+    setTimeout(() => {
+        particle.remove();
+    }, 1000);
 }
 
-// Background interaction
-document.body.addEventListener('click', (e) => {
-    if(e.target === document.body || e.target.classList.contains('heart-bg')) {
-        createSparkle(e.pageX, e.pageY);
-    }
-});
-
-function createSparkle(x, y) {
-    const sparkle = document.createElement('div');
-    sparkle.classList.add('sparkle');
-    sparkle.style.left = x + 'px';
-    sparkle.style.top = y + 'px';
-    document.body.appendChild(sparkle);
-    setTimeout(() => sparkle.remove(), 800);
+// --- 5. BACKGROUND PETALS ---
+function createPetal() {
+    const petal = document.createElement('div');
+    petal.classList.add('petal');
+    petal.style.left = Math.random() * 100 + "vw";
+    petal.style.animationDuration = Math.random() * 3 + 2 + "s";
+    petal.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e'][Math.floor(Math.random()*3)];
+    petalsContainer.appendChild(petal);
+    setTimeout(() => petal.remove(), 5000);
 }
 
-// Typing Effect
+// --- 6. TYPEWRITER EFFECT ---
 const text = "Will you be my Valentine?";
 let index = 0;
-const typewriterElement = document.getElementById('typewriterText');
 function typeWriter() {
     if (index < text.length) {
         typewriterElement.innerHTML += text.charAt(index);
@@ -151,4 +174,14 @@ function typeWriter() {
         setTimeout(typeWriter, 100);
     }
 }
-window.onload = typeWriter;
+
+// --- 7. WHATSAPP CONFIGURATION ---
+// IMPORTANT: Replace this with YOUR phone number!
+// Format: CountryCode + Number (No + or - or spaces)
+// Example for India: 919876543210
+const myPhoneNumber = "919999999999"; 
+
+const waBtn = document.getElementById('whatsappBtn');
+if(waBtn) {
+    waBtn.href = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20Happy%20Valentine's%20Day!`;
+}
