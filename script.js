@@ -15,8 +15,8 @@ const whatsappBtn = document.getElementById('whatsappBtn');
 const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
-let yesClickCount = 0; // Track Yes Clicks
-let loveScore = 0; // Start at 0%
+let yesClickCount = 0; 
+let loveScore = 0; 
 const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
 // --- 1. START & AUDIO UNLOCK ---
@@ -36,17 +36,19 @@ startOverlay.addEventListener('click', () => {
 });
 
 // --- 2. CURSOR HEART TRAIL ---
-document.addEventListener('mousemove', createHeartTrail);
+document.addEventListener('mousemove', (e) => {
+    createHeartTrail(e.clientX, e.clientY);
+});
 document.addEventListener('touchmove', (e) => {
-    createHeartTrail(e.touches[0]);
+    createHeartTrail(e.touches[0].clientX, e.touches[0].clientY);
 });
 
-function createHeartTrail(e) {
+function createHeartTrail(x, y) {
     const heart = document.createElement('div');
     heart.classList.add('cursor-heart');
     heart.innerHTML = '❤️';
-    heart.style.left = e.pageX + 'px';
-    heart.style.top = e.pageY + 'px';
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 1000);
 }
@@ -59,7 +61,6 @@ yesBtn.addEventListener('click', (e) => {
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
-    // Position near the button
     const rect = yesBtn.getBoundingClientRect();
     floatText.style.left = rect.left + 'px';
     floatText.style.top = rect.top + 'px';
@@ -70,49 +71,30 @@ yesBtn.addEventListener('click', (e) => {
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
-    // 1st - 3rd Click: Keep Going
     if (yesClickCount < 4) {
         yesBtn.innerText = yesTexts[yesClickCount];
-        
-        // Increase heartbeat speed visually (optional scaling effect)
-        document.body.style.animationDuration = (2 - (yesClickCount * 0.4)) + "s";
-        
         // Mini Celebration
         createHeartBurst(e.clientX, e.clientY);
     } 
-    // 4th Click: SUCCESS!
     else {
+        // SUCCESS!
         if(isAudioUnlocked) {
             noSound.pause();
             yesSound.volume = 0.8;
             yesSound.play();
         }
-
-        // Screen Shake Effect
         document.body.classList.add('shake');
-
         setTimeout(() => {
             document.body.classList.remove('shake');
             questionSection.classList.add('hidden');
             successSection.classList.remove('hidden');
             startConfetti(); 
             startRomanticRain();
-        }, 500); // Wait for shake to finish
+        }, 500);
     }
 });
 
-// --- 4. NO BUTTON LOGIC (Magnetic Repulsion) ---
-// Runs away when mouse/finger gets CLOSE (not just click)
-document.addEventListener('mousemove', (e) => {
-    const rect = noBtn.getBoundingClientRect();
-    const distance = Math.hypot(rect.x - e.clientX, rect.y - e.clientY);
-    
-    // If cursor is within 100px of No button, move it!
-    if (distance < 100) {
-        moveNoButton();
-    }
-});
-
+// --- 4. NO BUTTON LOGIC (Centered Movement) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; 
@@ -124,15 +106,30 @@ function moveNoButton() {
     const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
     if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
-    // Teleport
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
-    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+    // --- UPDATED MATH: MOVE WITHIN CENTER ---
+    // We define a spread (e.g., 100px) around the center of the screen
+    const spread = 100; 
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    
+    // Calculate random offset (-spread to +spread)
+    const randomX = (Math.random() * spread * 2) - spread;
+    const randomY = (Math.random() * spread * 2) - spread;
+
+    // Apply new fixed position relative to center
     noBtn.style.position = 'fixed';
-    noBtn.style.left = Math.max(10, Math.random() * maxX) + 'px';
-    noBtn.style.top = Math.max(10, Math.random() * maxY) + 'px';
+    noBtn.style.left = (centerX + randomX) + 'px';
+    noBtn.style.top = (centerY + randomY) + 'px';
 }
 
+// Trigger move on Hover or Click
+noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
+noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Stop mobile click
+    moveNoButton();
+});
+
 
 // --- 5. EFFECTS & UTILS ---
 function createHeartBurst(x, y) {
@@ -167,7 +164,6 @@ function startRomanticRain() {
 function createPetalOrPhoto() {
     const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
-    
     if (isPhoto) {
         element.classList.add('floating-photo');
         const photos = [
@@ -182,7 +178,6 @@ function createPetalOrPhoto() {
         element.classList.add('petal');
         element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e'][Math.floor(Math.random()*3)];
     }
-
     element.style.left = Math.random() * 100 + "vw";
     element.style.animationDuration = Math.random() * 3 + 2 + "s";
     petalsContainer.appendChild(element);
@@ -210,10 +205,8 @@ function startConfetti() {
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
     const particles = [];
     const colors = ['#ff0055', '#ff9a9e', '#ffd166', '#06d6a0', '#118ab2'];
-    
     for(let i=0; i<200; i++) {
         particles.push({
             x: canvas.width / 2, y: canvas.height / 2,
