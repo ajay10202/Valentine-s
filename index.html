@@ -2,66 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Be My Valentine?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Will You Be My Valentine? 🌹</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="startOverlay">
+        <div class="start-content">
+            <h1>Tap to Start ❤️</h1>
+            <p style="font-family: 'Poppins', sans-serif; color: white;">(Turn up your volume! 🔊)</p>
+        </div>
+    </div>
+
+    <audio id="noSound" preload="auto">
+        <source src="no.mp3" type="audio/mp3">
+    </audio>
+    <audio id="yesSound" loop preload="auto">
+        <source src="yes.mp3" type="audio/mp3">
+    </audio>
 
     <div class="bg-gradient"></div>
     <div id="petalsContainer"></div>
     <canvas id="confettiCanvas"></canvas>
 
-    <audio id="bgMusic" src="music.mp3" loop></audio>
-    
-    <audio id="yesSound" src="yes.mp3"></audio>
-    
-    <audio id="noSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
-
-    <div id="startOverlay">
-        <div class="start-content">
-            <h1>💌</h1>
-            <p>Tap to Open Letter<br><span style="font-size: 0.8rem">(Sound On 🔊)</span></p>
-        </div>
-    </div>
-
     <div class="meter-container">
-        <div class="meter-label">Love Meter 💖</div>
+        <div class="meter-label">Love Meter 🩵💛</div>
         <div class="meter-bar-bg">
             <div id="loveMeterBar" class="meter-bar-fill"></div>
         </div>
     </div>
-
-    <div class="container">
+    
+    <div class="container" id="mainContainer">
         
         <div id="questionSection">
             <div class="gif-container">
-                <img src="https://media.giphy.com/media/u23zXEvNsIbfO/giphy.gif" alt="Cute Bear">
+                <img id="mainGif" src="image.png" alt="Cute bear">
             </div>
             
-            <h1 id="mainTitle">Hey Beautiful!</h1>
-            <p id="typewriterText"></p>
+            <h1 id="typewriterText"></h1>
+            
+            <p class="normal-text">Try To Click No !!😜</p>
             
             <div class="btn-group">
-                <button id="yesBtn">Yes! 💖</button>
-                <button id="noBtn">No 😢</button>
+                <button id="yesBtn">Yes! 🩷</button>
+                <button id="noBtn">No 💔</button>
             </div>
         </div>
 
         <div id="successSection" class="hidden">
             <div class="gif-container">
-                <img src="https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif" alt="Happy Cat">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
             </div>
-            <h2>Yay! I knew it! 💍</h2>
-            <p>Pick a date for our date:</p>
+            
+            <h2>I Love You Di Pondati 🩵💛</h2>
+            
+            <p class="romantic-msg">You Are My Today And All oF My Tomorrows. 🌹</p>
             
             <div class="date-picker-container">
+                <p class="normal-text">Ena Epo Paaka varuva Thangoo? 📅</p>
                 <input type="date" id="dateInput">
-                <br>
-                <a href="#" id="whatsappBtn" class="whatsapp-btn">
-                    Send to WhatsApp 💬
-                </a>
             </div>
+
+            <a id="whatsappBtn" href="#" target="_blank" class="whatsapp-btn">
+                Send me the Date! 💌
+            </a>
         </div>
 
     </div>
