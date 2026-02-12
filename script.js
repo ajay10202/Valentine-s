@@ -15,9 +15,9 @@ const whatsappBtn = document.getElementById('whatsappBtn');
 const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
-let yesScale = 1; 
-let noScale = 1;
-let loveScore = 30;
+let yesClickCount = 0; // Track Yes Clicks
+let loveScore = 0; // Start at 0%
+const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
 // --- 1. START & AUDIO UNLOCK ---
 startOverlay.addEventListener('click', () => {
@@ -36,7 +36,6 @@ startOverlay.addEventListener('click', () => {
 });
 
 // --- 2. CURSOR HEART TRAIL ---
-// Replaced Magic Dust with Hearts
 document.addEventListener('mousemove', createHeartTrail);
 document.addEventListener('touchmove', (e) => {
     createHeartTrail(e.touches[0]);
@@ -49,94 +48,108 @@ function createHeartTrail(e) {
     heart.style.left = e.pageX + 'px';
     heart.style.top = e.pageY + 'px';
     document.body.appendChild(heart);
-    
-    setTimeout(() => {
-        heart.remove();
-    }, 1000);
+    setTimeout(() => heart.remove(), 1000);
 }
 
-// --- 3. DYNAMIC TITLE ---
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        document.title = "Miss you already! 💔";
-    } else {
-        document.title = "Be My Valentine? 🌹";
+// --- 3. YES BUTTON GAME LOGIC (4 Clicks) ---
+yesBtn.addEventListener('click', (e) => {
+    yesClickCount++;
+    
+    // Create Floating "+25% Love" Text
+    const floatText = document.createElement('div');
+    floatText.classList.add('float-text');
+    floatText.innerText = "+25% Love! 💘";
+    // Position near the button
+    const rect = yesBtn.getBoundingClientRect();
+    floatText.style.left = rect.left + 'px';
+    floatText.style.top = rect.top + 'px';
+    document.body.appendChild(floatText);
+    setTimeout(() => floatText.remove(), 1000);
+
+    // Update Meter
+    loveScore += 25;
+    loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
+
+    // 1st - 3rd Click: Keep Going
+    if (yesClickCount < 4) {
+        yesBtn.innerText = yesTexts[yesClickCount];
+        
+        // Increase heartbeat speed visually (optional scaling effect)
+        document.body.style.animationDuration = (2 - (yesClickCount * 0.4)) + "s";
+        
+        // Mini Celebration
+        createHeartBurst(e.clientX, e.clientY);
+    } 
+    // 4th Click: SUCCESS!
+    else {
+        if(isAudioUnlocked) {
+            noSound.pause();
+            yesSound.volume = 0.8;
+            yesSound.play();
+        }
+
+        // Screen Shake Effect
+        document.body.classList.add('shake');
+
+        setTimeout(() => {
+            document.body.classList.remove('shake');
+            questionSection.classList.add('hidden');
+            successSection.classList.remove('hidden');
+            startConfetti(); 
+            startRomanticRain();
+        }, 500); // Wait for shake to finish
     }
 });
 
-// --- 4. HEART BURST (On Click) ---
-document.addEventListener('click', (e) => {
-    for(let i=0; i<5; i++) {
-        const heart = document.createElement('div');
-        heart.classList.add('heart-burst');
-        heart.innerHTML = '❤️';
-        heart.style.left = e.pageX + 'px';
-        heart.style.top = e.pageY + 'px';
-        heart.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
-        heart.style.setProperty('--ty', (Math.random() * 100 - 50) + 'px');
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 1000);
+// --- 4. NO BUTTON LOGIC (Magnetic Repulsion) ---
+// Runs away when mouse/finger gets CLOSE (not just click)
+document.addEventListener('mousemove', (e) => {
+    const rect = noBtn.getBoundingClientRect();
+    const distance = Math.hypot(rect.x - e.clientX, rect.y - e.clientY);
+    
+    // If cursor is within 100px of No button, move it!
+    if (distance < 100) {
+        moveNoButton();
     }
 });
 
-// --- 5. NO BUTTON LOGIC ---
-function moveNoButton(e) {
-    if(e) e.preventDefault(); 
-
+function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; 
-        noSound.volume = 0.5;
+        noSound.volume = 0.3;
         noSound.play(); 
     }
 
-    const decoy = document.createElement('button');
-    decoy.innerHTML = "No 💔";
-    decoy.className = 'decoy-btn';
-    const rect = noBtn.getBoundingClientRect();
-    decoy.style.left = rect.left + 'px';
-    decoy.style.top = rect.top + 'px';
-    document.body.appendChild(decoy);
+    // Shrink "No" / Grow "Yes"
+    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
+    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
-    setTimeout(() => {
-        decoy.style.transform = "translateY(50px) rotate(20deg)";
-        decoy.style.opacity = "0";
-    }, 10);
-    setTimeout(() => decoy.remove(), 1000);
-
-    if (noScale > 0.6) { noScale -= 0.05; noBtn.style.transform = `scale(${noScale})`; }
-    yesScale += 0.1; yesBtn.style.transform = `scale(${yesScale})`;
-
+    // Teleport
     const maxX = window.innerWidth - noBtn.offsetWidth - 20;
     const maxY = window.innerHeight - noBtn.offsetHeight - 20;
     noBtn.style.position = 'fixed';
     noBtn.style.left = Math.max(10, Math.random() * maxX) + 'px';
     noBtn.style.top = Math.max(10, Math.random() * maxY) + 'px';
-
-    const taunts = ["Really? 😢", "Think again! 🤔", "Poda! 😂", "Don't be mean!", "Catch me! 🏃"];
-    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
-    loveScore = Math.max(0, loveScore - 5);
-    loveMeterBar.style.width = loveScore + "%";
 }
 
-noBtn.addEventListener('mouseover', moveNoButton);
-noBtn.addEventListener('touchstart', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 
-// --- 6. YES BUTTON & CONFETTI ---
-yesBtn.addEventListener('click', () => {
-    if(isAudioUnlocked) {
-        noSound.pause();
-        yesSound.volume = 0.8;
-        yesSound.play();
+// --- 5. EFFECTS & UTILS ---
+function createHeartBurst(x, y) {
+    for(let i=0; i<8; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart-burst');
+        heart.innerHTML = '💖';
+        heart.style.left = x + 'px';
+        heart.style.top = y + 'px';
+        heart.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
+        heart.style.setProperty('--ty', (Math.random() * 100 - 50) + 'px');
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
     }
+}
 
-    questionSection.classList.add('hidden');
-    successSection.classList.remove('hidden');
-    loveScore = 100;
-    loveMeterBar.style.width = "100%";
-    
-    startConfetti(); 
-
+function startRomanticRain() {
     setInterval(() => {
         const item = document.createElement('div');
         item.innerHTML = Math.random() > 0.5 ? '❤️' : '🌹';
@@ -148,9 +161,9 @@ yesBtn.addEventListener('click', () => {
         document.body.appendChild(item);
         setTimeout(() => item.remove(), 3000);
     }, 200);
-});
+}
 
-// --- 7. FLOATING PHOTOS & PETALS ---
+// --- 6. FLOATING PHOTOS & PETALS ---
 function createPetalOrPhoto() {
     const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
@@ -176,13 +189,12 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), 5000);
 }
 
-// --- 8. DATE & WHATSAPP ---
+// --- 7. EXTRAS ---
 dateInput.addEventListener('change', (e) => {
     const date = e.target.value;
     whatsappBtn.href = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
 });
 
-// --- 9. TYPEWRITER ---
 const text = "Will you be my Valentine?";
 let index = 0;
 function typeWriter() {
@@ -193,7 +205,6 @@ function typeWriter() {
     }
 }
 
-// --- 10. CONFETTI ---
 function startConfetti() {
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
@@ -205,31 +216,20 @@ function startConfetti() {
     
     for(let i=0; i<200; i++) {
         particles.push({
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            vx: (Math.random() - 0.5) * 20,
-            vy: (Math.random() - 0.5) * 20,
+            x: canvas.width / 2, y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
             color: colors[Math.floor(Math.random() * colors.length)],
             size: Math.random() * 8 + 2
         });
     }
-
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach((p, index) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.2; 
-            p.size *= 0.96; 
-            
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-            ctx.fill();
-
+            p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.size *= 0.96; 
+            ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
             if(p.size < 0.5) particles.splice(index, 1);
         });
         if(particles.length > 0) requestAnimationFrame(animate);
     }
     animate();
-                          }
+}
