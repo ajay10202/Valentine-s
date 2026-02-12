@@ -8,27 +8,77 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffd1ff, #fbc2eb);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
     font-family: 'Poppins', sans-serif;
     overflow: hidden; 
-    perspective: 1000px; /* Essential for 3D Tilt */
+    background-color: #ff9a9e;
+    touch-action: none; 
+    user-select: none;
 }
 
+/* --- OVERLAY --- */
+#startOverlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.5s ease;
+}
+.start-content { text-align: center; animation: pulse 2s infinite; }
+.start-content h1 { color: #ff4d6d; font-size: 3rem; margin-bottom: 10px; }
+.start-content p { color: #fff; font-size: 1.2rem; }
+
+/* --- ANIMATED BG --- */
+.bg-gradient {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1, #fcb69f);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    z-index: -2;
+}
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* AUDIO INDICATOR */
-.music-note {
-    animation: pulse 1s infinite;
-    color: #ff4d6d;
+/* --- PETALS --- */
+.petal {
+    position: absolute;
+    background-color: #ff4d6d;
+    width: 15px;
+    height: 15px;
+    border-radius: 15px 0 15px 0;
+    z-index: -1;
+    opacity: 0.8;
+    animation: fall linear forwards;
+}
+@keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
 }
 
-/* 3D TILT CONTAINER */
+/* --- MAGIC DUST --- */
+.magic-particle {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(circle, #fff, #ff4d6d);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: fadeOut 1s linear forwards;
+    z-index: 9999;
+    box-shadow: 0 0 10px #ff4d6d;
+}
+@keyframes fadeOut {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+/* --- CARD --- */
 .container {
     text-align: center;
     background: rgba(255, 255, 255, 0.90);
@@ -36,50 +86,46 @@ body {
     border-radius: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     z-index: 10;
-    width: 90%;
-    max-width: 380px; 
+    width: 85%;
+    max-width: 400px; 
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.8);
-    
-    /* 3D Transform Properties */
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out; /* Smooth follow */
 }
 
-/* Element depth for 3D effect */
-.container > * {
-    transform: translateZ(20px);
-}
 .gif-container img {
     width: 100%;
-    max-width: 200px;
+    max-width: 220px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    transform: translateZ(30px);
 }
 
-/* BUTTONS */
+h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 3rem; margin: 10px 0; line-height: 1.1; }
+h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; margin: 10px 0; }
+p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.5rem; font-weight: 600; }
+
+/* --- BUTTONS --- */
 .btn-group {
     display: flex;
     justify-content: center;
     align-items: center; 
-    gap: 20px;
-    margin-top: 20px;
-    height: 60px;
-    transform: translateZ(40px); /* Buttons float higher */
+    gap: 15px;
+    margin-top: 25px;
+    height: 70px;
+    position: relative; 
 }
 
 button {
-    padding: 12px 35px;
-    font-size: 1.1rem;
+    padding: 12px 30px;
+    font-size: 1.2rem;
     border: none;
     border-radius: 50px;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.2s ease;
     white-space: nowrap; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    -webkit-tap-highlight-color: transparent;
 }
 
 #yesBtn {
@@ -87,15 +133,6 @@ button {
     color: white;
     z-index: 100;
     animation: heartbeat 1.5s infinite;
-}
-
-@keyframes heartbeat {
-    0% { transform: scale(1); }
-    15% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 77, 109, 0.6); }
-    30% { transform: scale(1); }
-    45% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 77, 109, 0.6); }
-    60% { transform: scale(1); }
-    100% { transform: scale(1); }
 }
 
 #noBtn {
@@ -106,52 +143,62 @@ button {
     z-index: 9999;
 }
 
-/* LOVE METER */
+/* Decoy Buttons (Chaos Mode) */
+.decoy-btn {
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    background-color: #ccc;
+    color: white;
+    border: none;
+    z-index: 9998;
+    position: fixed;
+    transition: all 1s ease;
+    pointer-events: none; /* Can't click them */
+}
+
+/* WhatsApp Button */
+.whatsapp-btn {
+    display: inline-block;
+    background-color: #25D366;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    animation: pulse 2s infinite;
+}
+
+/* --- METER --- */
 .meter-container {
     position: fixed;
-    top: 20px;
-    width: 80%;
+    top: 15px;
+    width: 85%;
     max-width: 400px;
     z-index: 1000;
     text-align: center;
 }
-.meter-label {
-    font-family: 'Poppins', sans-serif;
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
+.meter-label { color: white; font-weight: bold; text-shadow: 0 2px 2px rgba(0,0,0,0.3); font-family: 'Poppins', sans-serif; }
 .meter-bar-bg {
-    width: 100%;
-    height: 15px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    overflow: hidden;
+    width: 100%; height: 12px; background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px; overflow: hidden; margin-top: 5px;
 }
 .meter-bar-fill {
-    width: 20%;
-    height: 100%;
-    background: linear-gradient(90deg, #ff9a9e, #ff0055);
+    width: 20%; height: 100%; background: linear-gradient(90deg, #ff9a9e, #ff0055);
     transition: width 0.3s ease;
 }
 
-/* FONTS */
-h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 3.2rem; margin: 5px 0; text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5); }
-h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.8rem; margin: 10px 0; }
-p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.6rem; font-weight: 600; }
-
-/* PARTICLES */
-.sparkle, .kiss, .love-letter {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    15% { transform: scale(1.05); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
-.sparkle { width: 6px; height: 6px; background: #ffd700; border-radius: 50%; animation: fadeOut 0.8s forwards; }
-.kiss { font-size: 2rem; animation: floatUp 3s forwards; }
-.love-letter { font-size: 1.5rem; animation: floatSide 4s forwards; }
 
-@keyframes fadeOut { 100% { opacity: 0; transform: scale(0); } }
-@keyframes floatUp { 100% { transform: translateY(-100px); opacity: 0; } }
-@keyframes floatSide { 100% { transform: translateY(-50px) rotate(20deg); opacity: 0; } }
+@keyframes pulse { 0% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.8; transform: scale(1); } }
 
 .hidden { display: none; }
