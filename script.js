@@ -1,5 +1,6 @@
 const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
+const container = document.getElementById('mainContainer');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const loveMeterBar = document.getElementById('loveMeterBar');
@@ -31,12 +32,27 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
-        // Spawns petals/photos every 300ms
         setInterval(createPetalOrPhoto, 300);
+        setInterval(createLivestreamHeart, 600); // New Livestream Heart Effect
     }, 500);
 });
 
-// --- 2. DYNAMIC CURSOR TRAIL (Mixed Emojis) ---
+// --- 2. 3D CARD TILT EFFECT (Holographic Feel) ---
+document.addEventListener('mousemove', (e) => {
+    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+    
+    // Apply rotation to container
+    container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+});
+
+// Reset tilt on touch devices after touch ends
+document.addEventListener('touchend', () => {
+    container.style.transform = `rotateY(0deg) rotateX(0deg)`;
+});
+
+
+// --- 3. DYNAMIC CURSOR TRAIL ---
 document.addEventListener('mousemove', (e) => {
     createCursorTrail(e.clientX, e.clientY);
 });
@@ -47,73 +63,29 @@ document.addEventListener('touchmove', (e) => {
 function createCursorTrail(x, y) {
     const item = document.createElement('div');
     item.classList.add('cursor-item');
-    
-    // Random Romantic Emojis
     const emojis = ['❤️', '✨', '💖', '🌹', '🦋', '💋'];
     item.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-    
-    // Random Position Offset (scatter effect)
     const offsetX = (Math.random() - 0.5) * 20;
     const offsetY = (Math.random() - 0.5) * 20;
-    
     item.style.left = (x + offsetX) + 'px';
     item.style.top = (y + offsetY) + 'px';
-    
     document.body.appendChild(item);
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. DYNAMIC BACKGROUND RAIN (Swaying & Depth) ---
-function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; // 20% chance photo
-    const element = document.createElement('div');
-    
-    // A. Setup Content
-    if (isPhoto) {
-        element.classList.add('floating-photo');
-        const photos = [
-            "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif",
-            "https://media.giphy.com/media/l0HlO3BJ8LALPW4sE/giphy.gif"
-        ]; 
-        const img = document.createElement('img');
-        img.src = photos[Math.floor(Math.random() * photos.length)];
-        img.style.width = '100%';
-        element.appendChild(img);
-    } else {
-        element.classList.add('petal');
-        // Random Petal Color
-        element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e', '#ffd166'][Math.floor(Math.random()*4)];
-    }
-
-    // B. Random Size & Depth (Blur)
-    const size = Math.random() * 20 + 10; // 10px to 30px
-    element.style.width = isPhoto ? '50px' : `${size}px`;
-    element.style.height = isPhoto ? 'auto' : `${size}px`;
-    
-    // Depth Effect: Smaller items are blurrier and slower
-    if (size < 15 && !isPhoto) {
-        element.style.filter = "blur(2px)";
-        element.style.opacity = "0.6";
-        element.style.zIndex = "-5";
-    } else {
-        element.style.filter = "blur(0px)";
-        element.style.opacity = "0.9";
-        element.style.zIndex = "-1";
-    }
-
-    // C. Random Animation (Sway Left, Sway Right, or Straight)
-    const duration = Math.random() * 5 + 5; // 5s to 10s
-    const animations = ['fall-straight', 'fall-sway-left', 'fall-sway-right'];
-    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
-    
-    element.style.animation = `${randomAnim} ${duration}s linear forwards`;
-    element.style.left = Math.random() * 100 + "vw";
-
-    petalsContainer.appendChild(element);
-    setTimeout(() => element.remove(), duration * 1000);
+// --- 4. LIVESTREAM HEARTS (Bottom Right) ---
+function createLivestreamHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('stream-heart');
+    const emojis = ['❤️', '🧡', '💛', '💚', '💙', '💜', '💖'];
+    heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    // Randomize position slightly
+    heart.style.right = (20 + Math.random() * 50) + 'px';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
 }
 
-// --- 4. YES BUTTON GAME LOGIC ---
+// --- 5. YES BUTTON GAME LOGIC ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
@@ -150,15 +122,23 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC ---
+// --- 6. NO BUTTON LOGIC (No Shrinking, Smoke Effect) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
-    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
-    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
-    
-    const spread = 100; 
+
+    // CREATE SMOKE PUFF at old location
+    const rect = noBtn.getBoundingClientRect();
+    const puff = document.createElement('div');
+    puff.classList.add('smoke-puff');
+    puff.style.left = rect.left + 'px';
+    puff.style.top = rect.top + 'px';
+    document.body.appendChild(puff);
+    setTimeout(() => puff.remove(), 500);
+
+    // MOVE LOGIC (Center Safe Zone)
+    const spread = 150; // Larger spread for more movement
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
     const randomX = (Math.random() * spread * 2) - spread;
@@ -167,12 +147,58 @@ function moveNoButton() {
     noBtn.style.position = 'fixed';
     noBtn.style.left = (centerX + randomX) + 'px';
     noBtn.style.top = (centerY + randomY) + 'px';
+    
+    // Funny Texts
+    const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
+    noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
 }
+
 noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
 
-// --- 6. WHATSAPP LOGIC ---
+
+// --- 7. DYNAMIC RAIN & UTILS ---
+function createPetalOrPhoto() {
+    const isPhoto = Math.random() < 0.2; 
+    const element = document.createElement('div');
+    if (isPhoto) {
+        element.classList.add('floating-photo');
+        const photos = [
+            "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif",
+            "https://media.giphy.com/media/l0HlO3BJ8LALPW4sE/giphy.gif"
+        ]; 
+        const img = document.createElement('img');
+        img.src = photos[Math.floor(Math.random() * photos.length)];
+        img.style.width = '100%';
+        element.appendChild(img);
+    } else {
+        element.classList.add('petal');
+        element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e', '#ffd166'][Math.floor(Math.random()*4)];
+    }
+    const size = Math.random() * 20 + 10; 
+    element.style.width = isPhoto ? '50px' : `${size}px`;
+    element.style.height = isPhoto ? 'auto' : `${size}px`;
+    
+    if (size < 15 && !isPhoto) {
+        element.style.filter = "blur(2px)";
+        element.style.opacity = "0.6";
+        element.style.zIndex = "-5";
+    } else {
+        element.style.filter = "blur(0px)";
+        element.style.opacity = "0.9";
+        element.style.zIndex = "-1";
+    }
+
+    const duration = Math.random() * 5 + 5; 
+    const animations = ['fall-straight', 'fall-sway-left', 'fall-sway-right'];
+    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    element.style.animation = `${randomAnim} ${duration}s linear forwards`;
+    element.style.left = Math.random() * 100 + "vw";
+    petalsContainer.appendChild(element);
+    setTimeout(() => element.remove(), duration * 1000);
+}
+
 whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
@@ -184,7 +210,6 @@ whatsappBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- UTILS ---
 function createHeartBurst(x, y) {
     for(let i=0; i<8; i++) {
         const heart = document.createElement('div');
