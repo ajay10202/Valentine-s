@@ -11,8 +11,7 @@ const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// --- 🔧 CONFIGURATION ---
-// Your Phone Number (Correctly Formatted)
+// CONFIG
 const myPhoneNumber = "916380052805"; 
 
 let isAudioUnlocked = false;
@@ -33,7 +32,7 @@ startOverlay.addEventListener('click', () => {
         isAudioUnlocked = true;
         typeWriter();
         setInterval(createPetalOrPhoto, 300);
-        setInterval(createLivestreamHeart, 600); // Livestream Hearts
+        setInterval(createLivestreamHeart, 600);
     }, 500);
 });
 
@@ -58,7 +57,7 @@ function createCursorTrail(x, y) {
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. LIVESTREAM HEARTS (Bottom Right) ---
+// --- 3. LIVESTREAM HEARTS ---
 function createLivestreamHeart() {
     const heart = document.createElement('div');
     heart.classList.add('stream-heart');
@@ -73,7 +72,6 @@ function createLivestreamHeart() {
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
-    // Floating text
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -83,7 +81,6 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
-    // Meter
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
@@ -108,13 +105,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC (BIG BUTTON + SAFE ZONE + SMOKE) ---
+// --- 5. NO BUTTON LOGIC (FULL SCREEN MOVEMENT) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
 
-    // A. Create Smoke Puff at old position
+    // A. Smoke Puff
     const rect = noBtn.getBoundingClientRect();
     const puff = document.createElement('div');
     puff.classList.add('smoke-puff');
@@ -123,19 +120,18 @@ function moveNoButton() {
     document.body.appendChild(puff);
     setTimeout(() => puff.remove(), 500);
 
-    // B. Move logic (Teleport within center area)
-    // 150px spread from center = 300x300px box in middle of screen
-    const spread = 150; 
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    
-    const randomX = (Math.random() * spread * 2) - spread;
-    const randomY = (Math.random() * spread * 2) - spread;
+    // B. Calculate FULL Screen Boundaries
+    // We subtract the button size so it doesn't go off the edge
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20; // 20px padding
+    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
 
     // Apply fixed positioning
     noBtn.style.position = 'fixed';
-    noBtn.style.left = (centerX + randomX) + 'px';
-    noBtn.style.top = (centerY + randomY) + 'px';
+    noBtn.style.left = randomX + 'px';
+    noBtn.style.top = randomY + 'px';
     
     // Funny Texts
     const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
@@ -194,7 +190,6 @@ whatsappBtn.addEventListener('click', (e) => {
     const date = dateInput.value;
     
     if (date) {
-        // Updated URL Construction
         const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
         window.open(url, '_blank');
     } else {
