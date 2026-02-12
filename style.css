@@ -1,10 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&family=Poppins:wght@300;400;600&display=swap');
 
-body {
+/* --- 1. GLOBAL RESET (Fixes Alignment) --- */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+body {
     height: 100vh;
-    width: 100vw;
+    width: 100%; /* Changed from 100vw to prevent scrollbar shifting */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,10 +18,26 @@ body {
     background-color: #ff9a9e;
     touch-action: none; 
     user-select: none;
+    /* Custom Cursor */
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="%23ff0055"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'), auto;
 }
 
-/* OVERLAY */
+/* --- 2. CURSOR HEART TRAIL --- */
+.cursor-heart {
+    position: absolute;
+    pointer-events: none;
+    font-size: 20px;
+    z-index: 9999;
+    animation: floatUp 1s ease-out forwards;
+    opacity: 1;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-30px) scale(0.5); opacity: 0; }
+}
+
+/* --- OVERLAY --- */
 #startOverlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -31,7 +52,7 @@ body {
 }
 .start-content { text-align: center; animation: pulse 2s infinite; }
 
-/* CONFETTI CANVAS */
+/* --- BACKGROUNDS --- */
 #confettiCanvas {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -39,7 +60,6 @@ body {
     z-index: 999;
 }
 
-/* BACKGROUND GRADIENT */
 .bg-gradient {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -48,13 +68,14 @@ body {
     animation: gradientBG 10s ease infinite;
     z-index: -2;
 }
+
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* FALLING ITEMS (Petals & Photos) */
+/* --- FALLING ITEMS --- */
 .petal, .floating-photo {
     position: absolute;
     z-index: -1;
@@ -72,12 +93,11 @@ body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     transform: rotate(10deg);
 }
-
 @keyframes fall {
     to { transform: translateY(110vh) rotate(720deg); }
 }
 
-/* HEART BURST (On Click) */
+/* --- HEART BURST --- */
 .heart-burst {
     position: absolute;
     color: #ff0055;
@@ -91,31 +111,36 @@ body {
     100% { transform: scale(1.5) translate(var(--tx), var(--ty)); opacity: 0; }
 }
 
-/* CARD CONTAINER */
+/* --- MAIN CONTAINER --- */
 .container {
     text-align: center;
     background: rgba(255, 255, 255, 0.90);
-    padding: 2.5rem;
+    padding: 2rem; /* Slightly reduced padding for mobile */
     border-radius: 30px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     z-index: 10;
-    width: 85%;
+    width: 90%; /* Changed from 85% to 90% for better mobile fit */
     max-width: 400px; 
+    margin: 0 auto; /* Crucial for centering */
     backdrop-filter: blur(10px);
     border: 2px solid rgba(255, 255, 255, 0.8);
+    position: relative; /* Ensure it stays in flow */
 }
-.gif-container img { width: 100%; max-width: 220px; border-radius: 20px; }
-h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 3rem; margin: 10px 0; line-height: 1.1; }
+
+.gif-container img { width: 100%; max-width: 200px; border-radius: 20px; }
+
+h1 { font-family: 'Great Vibes', cursive; color: #d63353; font-size: 2.8rem; margin: 10px 0; line-height: 1.1; }
 h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; margin: 10px 0; }
 p { font-family: 'Sacramento', cursive; color: #c0392b; font-size: 1.5rem; font-weight: 600; }
 
-/* BUTTONS */
+/* --- BUTTONS --- */
 .btn-group {
     display: flex; justify-content: center; align-items: center; 
     gap: 15px; margin-top: 25px; height: 70px; position: relative; 
+    width: 100%; /* Ensure container fills width */
 }
 button {
-    padding: 12px 30px; font-size: 1.2rem; border: none; border-radius: 50px;
+    padding: 12px 25px; font-size: 1.1rem; border: none; border-radius: 50px;
     cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600;
     transition: all 0.2s ease; white-space: nowrap; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.1); -webkit-tap-highlight-color: transparent;
@@ -130,16 +155,17 @@ button {
     position: relative; z-index: 9999;
 }
 .decoy-btn {
-    padding: 12px 30px; font-size: 1.2rem; border-radius: 50px;
+    padding: 12px 25px; font-size: 1.1rem; border-radius: 50px;
     background-color: #ccc; color: white; border: none;
     z-index: 9998; position: fixed; pointer-events: none;
 }
 
-/* DATE PICKER */
+/* --- INPUTS --- */
 .date-picker-container { margin-top: 20px; }
 input[type="date"] {
     padding: 10px; border-radius: 10px; border: 2px solid #ff4d6d;
     font-family: 'Poppins', sans-serif; color: #d63353; background: #fff0f3;
+    width: 80%;
 }
 .whatsapp-btn {
     display: inline-block; background-color: #25D366; color: white;
@@ -148,8 +174,11 @@ input[type="date"] {
     box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); animation: pulse 2s infinite;
 }
 
-/* METER */
-.meter-container { position: fixed; top: 15px; width: 85%; max-width: 400px; z-index: 1000; text-align: center; }
+/* --- METER --- */
+.meter-container { 
+    position: fixed; top: 15px; left: 50%; transform: translateX(-50%); 
+    width: 85%; max-width: 400px; z-index: 1000; text-align: center; 
+}
 .meter-label { color: white; font-weight: bold; text-shadow: 0 2px 2px rgba(0,0,0,0.3); }
 .meter-bar-bg { width: 100%; height: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 20px; overflow: hidden; margin-top: 5px; }
 .meter-bar-fill { width: 20%; height: 100%; background: linear-gradient(90deg, #ff9a9e, #ff0055); transition: width 0.3s ease; }
