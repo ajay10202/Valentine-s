@@ -3,66 +3,69 @@ const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const loveMeterBar = document.getElementById('loveMeterBar');
+const noSound = document.getElementById('noSound');
+const yesSound = document.getElementById('yesSound');
 const startOverlay = document.getElementById('startOverlay');
 const petalsContainer = document.getElementById('petalsContainer');
 const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// --- AUDIO SETUP ---
-const bgMusic = document.getElementById('bgMusic');
-const noSound = document.getElementById('noSound');
-const yesSound = document.getElementById('yesSound');
+// --- CONFIGURATION ---
+// IMPORTANT: Enter your number here! (No +, no spaces)
+const myPhoneNumber = "919999999999"; 
 
-// --- CONFIG ---
-const myPhoneNumber = "919999999999"; // Replace with your number
-const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 let isAudioUnlocked = false;
 let yesClickCount = 0; 
 let loveScore = 0; 
+const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
-// --- 1. START & AUDIO UNLOCK ---
+// --- 1. START OVERLAY (Audio Unlock) ---
 startOverlay.addEventListener('click', () => {
-    // A. Init Sound Effects
+    // Play and immediately pause to unlock AudioContext
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
     yesSound.pause();
     
-    // B. PLAY BACKGROUND MUSIC
-    bgMusic.volume = 0.5; 
-    bgMusic.play().catch(e => console.log("Audio play failed", e));
-    
-    // C. Start Animation
     startOverlay.style.opacity = '0';
     setTimeout(() => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
+        // Start background rain
         setInterval(createPetalOrPhoto, 300);
     }, 500);
 });
 
-// --- 2. DYNAMIC CURSOR TRAIL ---
-document.addEventListener('mousemove', (e) => createCursorTrail(e.clientX, e.clientY));
-document.addEventListener('touchmove', (e) => createCursorTrail(e.touches[0].clientX, e.touches[0].clientY));
+// --- 2. DYNAMIC CURSOR TRAIL (Mixed Emojis) ---
+document.addEventListener('mousemove', (e) => {
+    createCursorTrail(e.clientX, e.clientY);
+});
+document.addEventListener('touchmove', (e) => {
+    createCursorTrail(e.touches[0].clientX, e.touches[0].clientY);
+});
 
 function createCursorTrail(x, y) {
     const item = document.createElement('div');
     item.classList.add('cursor-item');
+    
     const emojis = ['❤️', '✨', '💖', '🌹', '🦋', '💋'];
     item.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    
     const offsetX = (Math.random() - 0.5) * 20;
     const offsetY = (Math.random() - 0.5) * 20;
+    
     item.style.left = (x + offsetX) + 'px';
     item.style.top = (y + offsetY) + 'px';
+    
     document.body.appendChild(item);
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. BACKGROUND RAIN ---
+// --- 3. BACKGROUND RAIN (Swaying & Depth) ---
 function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; 
+    const isPhoto = Math.random() < 0.2; // 20% chance of photo
     const element = document.createElement('div');
     
     if (isPhoto) {
@@ -80,7 +83,8 @@ function createPetalOrPhoto() {
         element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e', '#ffd166'][Math.floor(Math.random()*4)];
     }
 
-    const size = Math.random() * 20 + 10;
+    // Random Size & Depth
+    const size = Math.random() * 20 + 10; 
     element.style.width = isPhoto ? '50px' : `${size}px`;
     element.style.height = isPhoto ? 'auto' : `${size}px`;
     
@@ -94,6 +98,7 @@ function createPetalOrPhoto() {
         element.style.zIndex = "-1";
     }
 
+    // Animation Style
     const duration = Math.random() * 5 + 5;
     const animations = ['fall-straight', 'fall-sway-left', 'fall-sway-right'];
     const randomAnim = animations[Math.floor(Math.random() * animations.length)];
@@ -105,10 +110,11 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), duration * 1000);
 }
 
-// --- 4. BUTTON LOGIC ---
+// --- 4. YES BUTTON GAME (4 Clicks) ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
+    // Floating Text
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -118,26 +124,21 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
+    // Meter Update
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
     if (yesClickCount < 4) {
         yesBtn.innerText = yesTexts[yesClickCount];
         createHeartBurst(e.clientX, e.clientY);
-    } else {
-        // --- SUCCESS STATE ---
+    } 
+    else {
+        // SUCCESS
         if(isAudioUnlocked) {
             noSound.pause();
-            
-            // 1. STOP BACKGROUND MUSIC
-            bgMusic.pause();
-            bgMusic.currentTime = 0; 
-            
-            // 2. PLAY YES.MP3
-            yesSound.volume = 1.0; 
+            yesSound.volume = 0.8;
             yesSound.play();
         }
-        
         document.body.classList.add('shake');
         setTimeout(() => {
             document.body.classList.remove('shake');
@@ -149,15 +150,15 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC (Fixed Size) ---
+// --- 5. NO BUTTON LOGIC (Safe Center Zone) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
+    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
+    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
-    // REMOVED: The shrinking logic code was here. 
-    // Now the button stays the same size.
-
+    // Move 100px around center
     const spread = 100; 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
@@ -172,7 +173,7 @@ noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
 
-// WHATSAPP
+// --- 6. WHATSAPP LOGIC ---
 whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
@@ -184,7 +185,7 @@ whatsappBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- HELPER FUNCTIONS ---
+// --- UTILS ---
 function createHeartBurst(x, y) {
     for(let i=0; i<8; i++) {
         const heart = document.createElement('div');
@@ -245,4 +246,4 @@ function startConfetti() {
         if(particles.length > 0) requestAnimationFrame(animate);
     }
     animate();
-}
+                }
