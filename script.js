@@ -11,8 +11,7 @@ const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// --- CONFIGURATION ---
-// IMPORTANT: Enter your number here! (No +, no spaces)
+// CONFIG
 const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
@@ -20,9 +19,8 @@ let yesClickCount = 0;
 let loveScore = 0; 
 const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
-// --- 1. START OVERLAY (Audio Unlock) ---
+// --- 1. START & AUDIO UNLOCK ---
 startOverlay.addEventListener('click', () => {
-    // Play and immediately pause to unlock AudioContext
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
@@ -33,7 +31,7 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
-        // Start background rain
+        // Spawns petals/photos every 300ms
         setInterval(createPetalOrPhoto, 300);
     }, 500);
 });
@@ -50,9 +48,11 @@ function createCursorTrail(x, y) {
     const item = document.createElement('div');
     item.classList.add('cursor-item');
     
+    // Random Romantic Emojis
     const emojis = ['❤️', '✨', '💖', '🌹', '🦋', '💋'];
     item.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
     
+    // Random Position Offset (scatter effect)
     const offsetX = (Math.random() - 0.5) * 20;
     const offsetY = (Math.random() - 0.5) * 20;
     
@@ -63,11 +63,12 @@ function createCursorTrail(x, y) {
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. BACKGROUND RAIN (Swaying & Depth) ---
+// --- 3. DYNAMIC BACKGROUND RAIN (Swaying & Depth) ---
 function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; // 20% chance of photo
+    const isPhoto = Math.random() < 0.2; // 20% chance photo
     const element = document.createElement('div');
     
+    // A. Setup Content
     if (isPhoto) {
         element.classList.add('floating-photo');
         const photos = [
@@ -80,14 +81,16 @@ function createPetalOrPhoto() {
         element.appendChild(img);
     } else {
         element.classList.add('petal');
+        // Random Petal Color
         element.style.backgroundColor = ['#ff4d6d', '#ff0055', '#ff9a9e', '#ffd166'][Math.floor(Math.random()*4)];
     }
 
-    // Random Size & Depth
-    const size = Math.random() * 20 + 10; 
+    // B. Random Size & Depth (Blur)
+    const size = Math.random() * 20 + 10; // 10px to 30px
     element.style.width = isPhoto ? '50px' : `${size}px`;
     element.style.height = isPhoto ? 'auto' : `${size}px`;
     
+    // Depth Effect: Smaller items are blurrier and slower
     if (size < 15 && !isPhoto) {
         element.style.filter = "blur(2px)";
         element.style.opacity = "0.6";
@@ -98,8 +101,8 @@ function createPetalOrPhoto() {
         element.style.zIndex = "-1";
     }
 
-    // Animation Style
-    const duration = Math.random() * 5 + 5;
+    // C. Random Animation (Sway Left, Sway Right, or Straight)
+    const duration = Math.random() * 5 + 5; // 5s to 10s
     const animations = ['fall-straight', 'fall-sway-left', 'fall-sway-right'];
     const randomAnim = animations[Math.floor(Math.random() * animations.length)];
     
@@ -110,11 +113,10 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), duration * 1000);
 }
 
-// --- 4. YES BUTTON GAME (4 Clicks) ---
+// --- 4. YES BUTTON GAME LOGIC ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
-    // Floating Text
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -124,7 +126,6 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
-    // Meter Update
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
@@ -133,7 +134,6 @@ yesBtn.addEventListener('click', (e) => {
         createHeartBurst(e.clientX, e.clientY);
     } 
     else {
-        // SUCCESS
         if(isAudioUnlocked) {
             noSound.pause();
             yesSound.volume = 0.8;
@@ -150,7 +150,7 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC (Safe Center Zone) ---
+// --- 5. NO BUTTON LOGIC ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
@@ -158,7 +158,6 @@ function moveNoButton() {
     const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
     if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
-    // Move 100px around center
     const spread = 100; 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
