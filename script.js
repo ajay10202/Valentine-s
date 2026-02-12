@@ -19,7 +19,7 @@ let yesClickCount = 0;
 let loveScore = 0; 
 const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
-// --- 1. START & AUDIO UNLOCK ---
+// 1. START & AUDIO UNLOCK
 startOverlay.addEventListener('click', () => {
     noSound.play().catch(e => {});
     noSound.pause();
@@ -36,7 +36,7 @@ startOverlay.addEventListener('click', () => {
     }, 500);
 });
 
-// --- 2. DYNAMIC CURSOR TRAIL ---
+// 2. DYNAMIC CURSOR TRAIL
 document.addEventListener('mousemove', (e) => {
     createCursorTrail(e.clientX, e.clientY);
 });
@@ -57,7 +57,7 @@ function createCursorTrail(x, y) {
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. LIVESTREAM HEARTS ---
+// 3. LIVESTREAM HEARTS
 function createLivestreamHeart() {
     const heart = document.createElement('div');
     heart.classList.add('stream-heart');
@@ -68,10 +68,9 @@ function createLivestreamHeart() {
     setTimeout(() => heart.remove(), 4000);
 }
 
-// --- 4. YES BUTTON GAME LOGIC ---
+// 4. YES BUTTON GAME LOGIC
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
-    
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -105,13 +104,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC (FULL SCREEN MOVEMENT) ---
+// 5. NO BUTTON LOGIC (FULL SCREEN TELEPORT)
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
 
-    // A. Smoke Puff
+    // Smoke Puff
     const rect = noBtn.getBoundingClientRect();
     const puff = document.createElement('div');
     puff.classList.add('smoke-puff');
@@ -120,20 +119,17 @@ function moveNoButton() {
     document.body.appendChild(puff);
     setTimeout(() => puff.remove(), 500);
 
-    // B. Calculate FULL Screen Boundaries
-    // We subtract the button size so it doesn't go off the edge
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20; // 20px padding
+    // Full Screen Math
+    const maxX = window.innerWidth - noBtn.offsetWidth - 20; 
     const maxY = window.innerHeight - noBtn.offsetHeight - 20;
 
     const randomX = Math.random() * maxX;
     const randomY = Math.random() * maxY;
 
-    // Apply fixed positioning
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomX + 'px';
     noBtn.style.top = randomY + 'px';
     
-    // Funny Texts
     const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
 }
@@ -143,7 +139,7 @@ noBtn.addEventListener('click', moveNoButton);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
 
 
-// --- 6. UTILS & ANIMATIONS ---
+// 6. UTILS & ANIMATIONS
 function createPetalOrPhoto() {
     const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
@@ -184,11 +180,9 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), duration * 1000);
 }
 
-// --- 7. WHATSAPP LOGIC ---
 whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
-    
     if (date) {
         const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
         window.open(url, '_blank');
