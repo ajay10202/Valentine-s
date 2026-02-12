@@ -3,8 +3,12 @@ const noBtn = document.getElementById('noBtn');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const loveMeterBar = document.getElementById('loveMeterBar');
+
+// AUDIO ELEMENTS
+const bgMusic = document.getElementById('bgMusic');
 const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
+
 const startOverlay = document.getElementById('startOverlay');
 const petalsContainer = document.getElementById('petalsContainer');
 const typewriterElement = document.getElementById('typewriterText');
@@ -21,6 +25,11 @@ const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
 // 1. START & AUDIO UNLOCK
 startOverlay.addEventListener('click', () => {
+    // Unlock and play Background Music
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(e => console.log("Audio play error", e));
+
+    // Unlock other sounds (Play/Pause trick)
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
@@ -88,10 +97,12 @@ yesBtn.addEventListener('click', (e) => {
         createHeartBurst(e.clientX, e.clientY);
     } 
     else {
+        // SUCCESS PHASE
         if(isAudioUnlocked) {
+            bgMusic.pause(); // Stop BG music
             noSound.pause();
             yesSound.volume = 0.8;
-            yesSound.play();
+            yesSound.play(); // Play Celebration
         }
         document.body.classList.add('shake');
         setTimeout(() => {
@@ -104,13 +115,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// 5. NO BUTTON LOGIC (FIXED SAFE BOUNDARIES)
+// 5. NO BUTTON LOGIC (SAFE ZONE MATH)
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
 
-    // A. Create Smoke Puff
+    // Smoke Puff
     const rect = noBtn.getBoundingClientRect();
     const puff = document.createElement('div');
     puff.classList.add('smoke-puff');
@@ -119,27 +130,24 @@ function moveNoButton() {
     document.body.appendChild(puff);
     setTimeout(() => puff.remove(), 500);
 
-    // B. SAFE MATH TO PREVENT DISAPPEARING
-    // 1. Get exact window size
+    // --- SAFE MATH START ---
     const winWidth = window.innerWidth;
     const winHeight = window.innerHeight;
-    
-    // 2. Get button size
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
 
-    // 3. Calculate Max Allowable Positions (with 30px padding on edges)
-    // We assume padding = 30px
+    // Safety padding (30px)
     const padding = 30;
+
+    // Max allowable Left and Top
     const maxLeft = winWidth - btnWidth - padding;
     const maxTop = winHeight - btnHeight - padding;
 
-    // 4. Randomize within Safe Zone (ensure it's at least 'padding' from top/left)
-    // Math.random() * (max - min) + min
+    // Generate random within padding and max
     const randomLeft = Math.random() * (maxLeft - padding) + padding;
     const randomTop = Math.random() * (maxTop - padding) + padding;
+    // --- SAFE MATH END ---
 
-    // 5. Apply
     noBtn.style.position = 'fixed';
     noBtn.style.left = randomLeft + 'px';
     noBtn.style.top = randomTop + 'px';
