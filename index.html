@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Be My Valentine? 🌹</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,7 +16,7 @@
         </div>
     </div>
 
-    <audio id="noSound" loop preload="auto">
+    <audio id="noSound" preload="auto">
         <source src="no.mp3" type="audio/mp3">
     </audio>
     <audio id="yesSound" loop preload="auto">
@@ -26,6 +25,7 @@
 
     <div class="bg-gradient"></div>
     <div id="petalsContainer"></div>
+    <canvas id="confettiCanvas"></canvas>
 
     <div class="meter-container">
         <div class="meter-label">Love Meter ❤️</div>
@@ -52,13 +52,18 @@
 
         <div id="successSection" class="hidden">
             <div class="gif-container">
-                <img id="successGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0YjJmYjY2YjI5ZjJmYjI5ZjJmYjI5ZjJmYjI5ZjJmYiZlcD12MV9pbnRlcm5hbF9naWZzX2dpZklkJmN0PWc/MDJ9IbxxvDUQM/giphy.gif" alt="Celebration">
             </div>
             <h2>I Love You! 🩵💛</h2>
-            <p class="romantic-msg">You are my today and all of my tomorrows. 💋</p>
+            <p class="romantic-msg">You are my today and all of my tomorrows. 🌹</p>
             
+            <div class="date-picker-container">
+                <p>When are we going out? 📅</p>
+                <input type="date" id="dateInput">
+            </div>
+
             <a id="whatsappBtn" href="#" target="_blank" class="whatsapp-btn">
-                Send me the good news! 💬
+                Send me the Date! 💌
             </a>
         </div>
 
