@@ -15,7 +15,7 @@ const noSound = document.getElementById('noSound');
 const yesSound = document.getElementById('yesSound');
 
 // --- CONFIG ---
-const myPhoneNumber = "919999999999"; // Replace with your number (CountryCode + Number)
+const myPhoneNumber = "919999999999"; // Replace with your number
 const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 let isAudioUnlocked = false;
 let yesClickCount = 0; 
@@ -30,8 +30,8 @@ startOverlay.addEventListener('click', () => {
     yesSound.pause();
     
     // B. PLAY BACKGROUND MUSIC
-    bgMusic.volume = 0.4; // 40% volume
-    bgMusic.play().catch(e => console.log("Audio play failed (user interaction needed)", e));
+    bgMusic.volume = 0.5; 
+    bgMusic.play().catch(e => console.log("Audio play failed", e));
     
     // C. Start Animation
     startOverlay.style.opacity = '0';
@@ -39,7 +39,6 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
-        // Spawn rain every 300ms
         setInterval(createPetalOrPhoto, 300);
     }, 500);
 });
@@ -61,9 +60,9 @@ function createCursorTrail(x, y) {
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 3. BACKGROUND RAIN (Sway + Depth) ---
+// --- 3. BACKGROUND RAIN ---
 function createPetalOrPhoto() {
-    const isPhoto = Math.random() < 0.2; // 20% chance photo
+    const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
     
     if (isPhoto) {
@@ -85,7 +84,6 @@ function createPetalOrPhoto() {
     element.style.width = isPhoto ? '50px' : `${size}px`;
     element.style.height = isPhoto ? 'auto' : `${size}px`;
     
-    // Depth of Field Effect
     if (size < 15 && !isPhoto) {
         element.style.filter = "blur(2px)";
         element.style.opacity = "0.6";
@@ -111,7 +109,6 @@ function createPetalOrPhoto() {
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
-    // Floating Text (+25%)
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -121,7 +118,6 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
-    // Update Meter
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
@@ -129,12 +125,19 @@ yesBtn.addEventListener('click', (e) => {
         yesBtn.innerText = yesTexts[yesClickCount];
         createHeartBurst(e.clientX, e.clientY);
     } else {
-        // SUCCESS STATE
+        // --- SUCCESS STATE ---
         if(isAudioUnlocked) {
             noSound.pause();
-            yesSound.volume = 0.8;
+            
+            // 1. STOP BACKGROUND MUSIC
+            bgMusic.pause();
+            bgMusic.currentTime = 0; 
+            
+            // 2. PLAY YES.MP3
+            yesSound.volume = 1.0; 
             yesSound.play();
         }
+        
         document.body.classList.add('shake');
         setTimeout(() => {
             document.body.classList.remove('shake');
@@ -146,14 +149,15 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// "NO" BUTTON ESCAPE
+// --- 5. NO BUTTON LOGIC (Fixed Size) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
-    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
-    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
+    // REMOVED: The shrinking logic code was here. 
+    // Now the button stays the same size.
+
     const spread = 100; 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
