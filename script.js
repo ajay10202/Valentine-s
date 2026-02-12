@@ -1,6 +1,5 @@
 const yesBtn = document.getElementById('yesBtn');
 const noBtn = document.getElementById('noBtn');
-const container = document.getElementById('mainContainer');
 const questionSection = document.getElementById('questionSection');
 const successSection = document.getElementById('successSection');
 const loveMeterBar = document.getElementById('loveMeterBar');
@@ -33,26 +32,11 @@ startOverlay.addEventListener('click', () => {
         isAudioUnlocked = true;
         typeWriter();
         setInterval(createPetalOrPhoto, 300);
-        setInterval(createLivestreamHeart, 600); // New Livestream Heart Effect
+        setInterval(createLivestreamHeart, 600); // Livestream Hearts
     }, 500);
 });
 
-// --- 2. 3D CARD TILT EFFECT (Holographic Feel) ---
-document.addEventListener('mousemove', (e) => {
-    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-    
-    // Apply rotation to container
-    container.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-});
-
-// Reset tilt on touch devices after touch ends
-document.addEventListener('touchend', () => {
-    container.style.transform = `rotateY(0deg) rotateX(0deg)`;
-});
-
-
-// --- 3. DYNAMIC CURSOR TRAIL ---
+// --- 2. DYNAMIC CURSOR TRAIL ---
 document.addEventListener('mousemove', (e) => {
     createCursorTrail(e.clientX, e.clientY);
 });
@@ -73,22 +57,22 @@ function createCursorTrail(x, y) {
     setTimeout(() => item.remove(), 1500);
 }
 
-// --- 4. LIVESTREAM HEARTS (Bottom Right) ---
+// --- 3. LIVESTREAM HEARTS (Bottom Right) ---
 function createLivestreamHeart() {
     const heart = document.createElement('div');
     heart.classList.add('stream-heart');
     const emojis = ['❤️', '🧡', '💛', '💚', '💙', '💜', '💖'];
     heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-    // Randomize position slightly
     heart.style.right = (20 + Math.random() * 50) + 'px';
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 4000);
 }
 
-// --- 5. YES BUTTON GAME LOGIC ---
+// --- 4. YES BUTTON GAME LOGIC ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
+    // Floating text
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -98,6 +82,7 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
+    // Meter
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
 
@@ -122,13 +107,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 6. NO BUTTON LOGIC (No Shrinking, Smoke Effect) ---
+// --- 5. NO BUTTON LOGIC (BIG BUTTON + SAFE ZONE + SMOKE) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
 
-    // CREATE SMOKE PUFF at old location
+    // A. Create Smoke Puff at old position
     const rect = noBtn.getBoundingClientRect();
     const puff = document.createElement('div');
     puff.classList.add('smoke-puff');
@@ -137,16 +122,21 @@ function moveNoButton() {
     document.body.appendChild(puff);
     setTimeout(() => puff.remove(), 500);
 
-    // MOVE LOGIC (Center Safe Zone)
-    const spread = 150; // Larger spread for more movement
+    // B. Move logic (Teleport within center area)
+    // 150px spread from center = 300x300px box in middle of screen
+    const spread = 150; 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
+    
     const randomX = (Math.random() * spread * 2) - spread;
     const randomY = (Math.random() * spread * 2) - spread;
 
+    // Apply fixed positioning
     noBtn.style.position = 'fixed';
     noBtn.style.left = (centerX + randomX) + 'px';
     noBtn.style.top = (centerY + randomY) + 'px';
+    
+    // NOTE: We are NOT changing scale here. Button stays big.
     
     // Funny Texts
     const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
@@ -158,7 +148,7 @@ noBtn.addEventListener('click', moveNoButton);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
 
 
-// --- 7. DYNAMIC RAIN & UTILS ---
+// --- 6. UTILS & ANIMATIONS ---
 function createPetalOrPhoto() {
     const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
