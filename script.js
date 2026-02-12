@@ -11,7 +11,9 @@ const typewriterElement = document.getElementById('typewriterText');
 const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
-// PHONE NUMBER CONFIG
+// --- 🔧 CONFIGURATION: ADD YOUR NUMBER HERE ---
+// Format: CountryCode + Number (No + or - or spaces)
+// Example for India: 919999999999
 const myPhoneNumber = "919999999999"; 
 
 let isAudioUnlocked = false;
@@ -21,6 +23,7 @@ const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
 // --- 1. START & AUDIO UNLOCK ---
 startOverlay.addEventListener('click', () => {
+    // Play and pause to unlock audio context
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
@@ -53,11 +56,11 @@ function createHeartTrail(x, y) {
     setTimeout(() => heart.remove(), 1000);
 }
 
-// --- 3. YES BUTTON GAME LOGIC (4 Clicks) ---
+// --- 3. YES BUTTON GAME LOGIC ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
-    // Create Floating "+25% Love" Text
+    // Floating "+25% Love"
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -73,11 +76,10 @@ yesBtn.addEventListener('click', (e) => {
 
     if (yesClickCount < 4) {
         yesBtn.innerText = yesTexts[yesClickCount];
-        // Mini Celebration
         createHeartBurst(e.clientX, e.clientY);
     } 
     else {
-        // SUCCESS!
+        // SUCCESS
         if(isAudioUnlocked) {
             noSound.pause();
             yesSound.volume = 0.8;
@@ -94,7 +96,7 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 4. NO BUTTON LOGIC (Centered Movement) ---
+// --- 4. NO BUTTON (Center Safe Zone) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; 
@@ -102,36 +104,44 @@ function moveNoButton() {
         noSound.play(); 
     }
 
-    // Shrink "No" / Grow "Yes"
     const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
     if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
     
-    // --- UPDATED MATH: MOVE WITHIN CENTER ---
-    // We define a spread (e.g., 100px) around the center of the screen
+    // Move within 100px of center
     const spread = 100; 
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    
-    // Calculate random offset (-spread to +spread)
     const randomX = (Math.random() * spread * 2) - spread;
     const randomY = (Math.random() * spread * 2) - spread;
 
-    // Apply new fixed position relative to center
     noBtn.style.position = 'fixed';
     noBtn.style.left = (centerX + randomX) + 'px';
     noBtn.style.top = (centerY + randomY) + 'px';
 }
 
-// Trigger move on Hover or Click
 noBtn.addEventListener('mouseover', moveNoButton);
 noBtn.addEventListener('click', moveNoButton);
-noBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Stop mobile click
-    moveNoButton();
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
+
+// --- 5. WHATSAPP CLICK HANDLER (FIXED) ---
+whatsappBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // STOP THE PAGE RELOAD
+
+    const date = dateInput.value;
+    
+    if (date) {
+        // Construct the URL
+        const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
+        
+        // Open WhatsApp in new tab
+        window.open(url, '_blank');
+    } else {
+        // Alert if no date selected
+        alert("Please pick a date first! 📅");
+    }
 });
 
-
-// --- 5. EFFECTS & UTILS ---
+// --- 6. UTILS & EFFECTS ---
 function createHeartBurst(x, y) {
     for(let i=0; i<8; i++) {
         const heart = document.createElement('div');
@@ -160,7 +170,6 @@ function startRomanticRain() {
     }, 200);
 }
 
-// --- 6. FLOATING PHOTOS & PETALS ---
 function createPetalOrPhoto() {
     const isPhoto = Math.random() < 0.2; 
     const element = document.createElement('div');
@@ -183,12 +192,6 @@ function createPetalOrPhoto() {
     petalsContainer.appendChild(element);
     setTimeout(() => element.remove(), 5000);
 }
-
-// --- 7. EXTRAS ---
-dateInput.addEventListener('change', (e) => {
-    const date = e.target.value;
-    whatsappBtn.href = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
-});
 
 const text = "Will you be my Valentine?";
 let index = 0;
