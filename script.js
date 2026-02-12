@@ -104,13 +104,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// 5. NO BUTTON LOGIC (FULL SCREEN TELEPORT)
+// 5. NO BUTTON LOGIC (FIXED SAFE BOUNDARIES)
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
 
-    // Smoke Puff
+    // A. Create Smoke Puff
     const rect = noBtn.getBoundingClientRect();
     const puff = document.createElement('div');
     puff.classList.add('smoke-puff');
@@ -119,16 +119,30 @@ function moveNoButton() {
     document.body.appendChild(puff);
     setTimeout(() => puff.remove(), 500);
 
-    // Full Screen Math
-    const maxX = window.innerWidth - noBtn.offsetWidth - 20; 
-    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+    // B. SAFE MATH TO PREVENT DISAPPEARING
+    // 1. Get exact window size
+    const winWidth = window.innerWidth;
+    const winHeight = window.innerHeight;
+    
+    // 2. Get button size
+    const btnWidth = noBtn.offsetWidth;
+    const btnHeight = noBtn.offsetHeight;
 
-    const randomX = Math.random() * maxX;
-    const randomY = Math.random() * maxY;
+    // 3. Calculate Max Allowable Positions (with 30px padding on edges)
+    // We assume padding = 30px
+    const padding = 30;
+    const maxLeft = winWidth - btnWidth - padding;
+    const maxTop = winHeight - btnHeight - padding;
 
+    // 4. Randomize within Safe Zone (ensure it's at least 'padding' from top/left)
+    // Math.random() * (max - min) + min
+    const randomLeft = Math.random() * (maxLeft - padding) + padding;
+    const randomTop = Math.random() * (maxTop - padding) + padding;
+
+    // 5. Apply
     noBtn.style.position = 'fixed';
-    noBtn.style.left = randomX + 'px';
-    noBtn.style.top = randomY + 'px';
+    noBtn.style.left = randomLeft + 'px';
+    noBtn.style.top = randomTop + 'px';
     
     const taunts = ["Oops! 💨", "Too slow! 😜", "Missed me! 👻", "Nope! 🛑", "Try harder! 💪"];
     noBtn.innerText = taunts[Math.floor(Math.random() * taunts.length)];
