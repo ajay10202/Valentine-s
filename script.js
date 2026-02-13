@@ -174,7 +174,7 @@ whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
     if (date) {
-        const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
+        const url = `https://wa.me/${916380052805}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
         window.open(url, '_blank');
     } else {
         alert("Please pick a date first! 📅");
@@ -243,3 +243,4 @@ function startConfetti() {
     }
     animate();
 }
+
