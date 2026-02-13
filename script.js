@@ -107,10 +107,11 @@ function createPetalOrPhoto() {
     setTimeout(() => element.remove(), duration * 1000);
 }
 
-// --- 4. YES BUTTON GAME ---
+// --- 4. YES BUTTON GAME (WITH LOVE SCORE BOUNCE) ---
 yesBtn.addEventListener('click', (e) => {
     yesClickCount++;
     
+    // Floating Hearts and Text
     const floatText = document.createElement('div');
     floatText.classList.add('float-text');
     floatText.innerText = "+25% Love! 💘";
@@ -120,8 +121,14 @@ yesBtn.addEventListener('click', (e) => {
     document.body.appendChild(floatText);
     setTimeout(() => floatText.remove(), 1000);
 
+    // Dynamic Love Meter filling
     loveScore += 25;
     loveMeterBar.style.width = Math.min(loveScore, 100) + "%";
+    
+    // Pulse animation logic
+    loveMeterBar.classList.remove('meter-active');
+    void loveMeterBar.offsetWidth; // Trigger reflow so animation restarts
+    loveMeterBar.classList.add('meter-active');
 
     if (yesClickCount < 4) {
         yesBtn.innerText = yesTexts[yesClickCount];
@@ -146,13 +153,11 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC (UPDATED: NO LONGER SHRINKS) ---
+// --- 5. NO BUTTON LOGIC (FIXED SIZE) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
-    
-    // The shrinking code was completely removed from here
     
     const spread = 100; 
     const centerX = window.innerWidth / 2;
@@ -241,4 +246,4 @@ function startConfetti() {
         if(particles.length > 0) requestAnimationFrame(animate);
     }
     animate();
-}
+                }
