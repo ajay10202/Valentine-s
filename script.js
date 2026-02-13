@@ -16,8 +16,8 @@ const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
 // --- CONFIGURATION ---
-// ENTER YOUR WHATSAPP NUMBER HERE (No +, no spaces)
-const myPhoneNumber = "919999999999"; 
+// UPDATED NUMBER HERE:
+const myPhoneNumber = "916380052805"; 
 
 let isAudioUnlocked = false;
 let yesClickCount = 0; 
@@ -26,14 +26,12 @@ const yesTexts = ["Yes! 💖", "Really? 😍", "Sure? 🌹", "YESSS! 💍"];
 
 // --- 1. START OVERLAY (Audio Unlock & Music Start) ---
 startOverlay.addEventListener('click', () => {
-    // Unlock all AudioContexts
     noSound.play().catch(e => {});
     noSound.pause();
     yesSound.play().catch(e => {});
     yesSound.pause();
     
-    // Play Background Music
-    bgMusic.volume = 0.4; // Set background volume lower (40%)
+    bgMusic.volume = 0.4; 
     bgMusic.play().catch(e => console.log("Audio play failed", e)); 
 
     startOverlay.style.opacity = '0';
@@ -41,7 +39,6 @@ startOverlay.addEventListener('click', () => {
         startOverlay.style.display = 'none';
         isAudioUnlocked = true;
         typeWriter();
-        // Start background rain
         setInterval(createPetalOrPhoto, 300);
     }, 500);
 });
@@ -134,10 +131,10 @@ yesBtn.addEventListener('click', (e) => {
     else {
         // SUCCESS LOGIC
         if(isAudioUnlocked) {
-            bgMusic.pause(); // Stop background music
+            bgMusic.pause(); 
             noSound.pause();
             yesSound.volume = 0.8;
-            yesSound.play(); // Play success music
+            yesSound.play(); 
         }
         document.body.classList.add('shake');
         setTimeout(() => {
