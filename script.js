@@ -16,7 +16,6 @@ const dateInput = document.getElementById('dateInput');
 const whatsappBtn = document.getElementById('whatsappBtn');
 
 // --- CONFIGURATION ---
-// UPDATED NUMBER HERE:
 const myPhoneNumber = "916380052805"; 
 
 let isAudioUnlocked = false;
@@ -147,13 +146,13 @@ yesBtn.addEventListener('click', (e) => {
     }
 });
 
-// --- 5. NO BUTTON LOGIC ---
+// --- 5. NO BUTTON LOGIC (UPDATED: NO LONGER SHRINKS) ---
 function moveNoButton() {
     if (isAudioUnlocked) {
         noSound.currentTime = 0; noSound.volume = 0.3; noSound.play(); 
     }
-    const currentScale = parseFloat(noBtn.style.transform.replace('scale(', '')) || 1;
-    if (currentScale > 0.5) noBtn.style.transform = `scale(${currentScale - 0.1})`;
+    
+    // The shrinking code was completely removed from here
     
     const spread = 100; 
     const centerX = window.innerWidth / 2;
@@ -174,7 +173,7 @@ whatsappBtn.addEventListener('click', (e) => {
     e.preventDefault(); 
     const date = dateInput.value;
     if (date) {
-        const url = `https://wa.me/${916380052805}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
+        const url = `https://wa.me/${myPhoneNumber}?text=I%20said%20YES!%20%F0%9F%92%96%20See%20you%20on%20${date}!%20%F0%9F%93%85`;
         window.open(url, '_blank');
     } else {
         alert("Please pick a date first! 📅");
@@ -243,4 +242,3 @@ function startConfetti() {
     }
     animate();
 }
-
