@@ -76,7 +76,7 @@ h2 { font-family: 'Great Vibes', cursive; color: #ff0055; font-size: 2.5rem; mar
     border: 2px solid rgba(255, 255, 255, 0.8); position: relative;
 }
 
-/* UPDATED HERE: Added video selector so it fits */
+/* Video/Image Container Sizing */
 .gif-container img, 
 .gif-container video { 
     width: 100%; 
